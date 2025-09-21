@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 
 export async function GET(request: Request) {
   try {
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
     const offset = parseInt(searchParams.get("offset") || "0")
     
     // Build where clause
-    const where: any = {}
+    const where: Prisma.CityWhereInput = {}
     
     if (search) {
       where.OR = [

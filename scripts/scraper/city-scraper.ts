@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables
+dotenv.config({ path: path.join(__dirname, '../../.env.local') });
 
 // Initialize Supabase client
 const supabase = createClient(

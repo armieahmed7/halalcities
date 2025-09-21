@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model City {
+  id                      String       @id @default(cuid())
+  slug                    String       @unique
+  name                    String
+  country                 String
+  primaryImage            String
+  lat                     Float
+  lng                     Float
+  
+  // Scores
+  halalScore              Int
+  muslimPopulationPercent Int
+  foodScore               Int
+  communityScore          Int
+  costScore               Int
+  internetScore           Int
+  safetyScore             Int
+  overallScore            Int
+  
+  // Stats
+  muslimPopulation        Int
+  mosquesCount            Int
+  halalRestaurants        Int
+  monthlyBudget           Int
+  internetSpeed           Int
+  
+  // Features
+  airportPrayerRoom       Boolean
+  halalHotels             Int
+  islamicBanks            Boolean
+  islamicSchools          Int
+  
+  // Relations
+  restaurants             Restaurant[]
+  mosques                 Mosque[]
+  reviews                 Review[]
+  
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+}
+
+model Restaurant {
+  id               String   @id @default(cuid())
+  name             String
+  cuisine          String
+  neighborhood     String
+  address          String
+  rating           Float    @default(0)
+  reviewCount      Int      @default(0)
+  priceLevel       Int      // 1-4
+  certifications   String[] // Array of certification types
+  features         String[] // Array of features
+  images           String[]
+  
+  // Location
+  lat              Float?
+  lng              Float?
+  
+  // Relations
+  city             City     @relation(fields: [cityId], references: [id])
+  cityId           String
+  reviews          Review[]
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@index([cityId])
+}
+
+model Mosque {
+  id                  String   @id @default(cuid())
+  name                String
+  address             String
+  lat                 Float
+  lng                 Float
+  capacity            Int
+  
+  // Features
+  womensSection       Boolean
+  parking             Boolean
+  wheelchairAccess    Boolean
+  ablutionFacilities  Boolean
+  classes             Boolean
+  
+  languages           String[] // Array of languages
+  jummahTime          String
+  
+  // Relations
+  city                City     @relation(fields: [cityId], references: [id])
+  cityId              String
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@index([cityId])
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String?
+  image             String?
+  bio               String?
+  nationality       String?
+  languages         String[]
+  dietaryRestrictions String[]
+  travelStyle       String?   // family, solo, business
+  
+  // Relations
+  reviews           Review[]
+  meetups           MeetupAttendee[]
+  posts             CommunityPost[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Review {
+  id           String      @id @default(cuid())
+  rating       Int         // 1-5
+  comment      String
+  helpful      Int         @default(0)
+  
+  // Relations
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
+  city         City?       @relation(fields: [cityId], references: [id])
+  cityId       String?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId String?
+  
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  
+  @@index([userId])
+  @@index([cityId])
+  @@index([restaurantId])
+}
+
+model Meetup {
+  id           String           @id @default(cuid())
+  title        String
+  description  String?
+  type         String           // jummah, social, professional, sisters
+  date         DateTime
+  location     String
+  maxAttendees Int?
+  
+  // Relations
+  cityId       String
+  attendees    MeetupAttendee[]
+  
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  
+  @@index([cityId])
+}
+
+model MeetupAttendee {
+  id        String   @id @default(cuid())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  meetup    Meetup   @relation(fields: [meetupId], references: [id])
+  meetupId  String
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, meetupId])
+}
+
+model CommunityPost {
+  id        String   @id @default(cuid())
+  content   String
+  cityId    String
+  
+  // Relations
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([cityId])
+  @@index([authorId])
+}
+
+model PrayerTime {
+  id        String   @id @default(cuid())
+  cityId    String
+  date      DateTime
+  fajr      String
+  sunrise   String
+  dhuhr     String
+  asr       String
+  maghrib   String
+  isha      String
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([cityId, date])
+  @@index([cityId])
+}

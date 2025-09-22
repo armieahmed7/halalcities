@@ -81,7 +81,7 @@ async function fetchRealMosqueData(cityName: string, lat: number, lng: number): 
     console.log(`  ✅ Found ${mosques.length} mosques from OSM`);
     return mosques.slice(0, 50); // Limit to 50 mosques per city
   } catch (error) {
-    console.error(`  ❌ OSM API error:`, error.message);
+    console.error(`  ❌ OSM API error:`, error instanceof Error ? error.message : 'Unknown error');
     // Fallback to estimated data
     return [];
   }
@@ -227,7 +227,7 @@ async function fetchRealHalalRestaurants(cityName: string, lat: number, lng: num
     console.log(`  ✅ Found ${restaurants.length} halal restaurants from OSM`);
     return restaurants.slice(0, 50); // Limit to 50 restaurants per city
   } catch (error) {
-    console.error(`  ❌ OSM Restaurant API error:`, error.message);
+    console.error(`  ❌ OSM Restaurant API error:`, error instanceof Error ? error.message : 'Unknown error');
     return [];
   }
 }
@@ -383,7 +383,7 @@ async function fetchPrayerTimes(cityId: string, lat: number, lng: number) {
       };
     }
   } catch (error) {
-    console.error(`  ❌ Prayer times API error:`, error.message);
+    console.error(`  ❌ Prayer times API error:`, error instanceof Error ? error.message : 'Unknown error');
   }
   
   // Fallback to estimated times

@@ -18,6 +18,7 @@ interface Coordinates {
 // This is a simplified prayer time calculation
 // In production, use a proper Islamic prayer time API
 export function calculatePrayerTimes(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   coordinates: Coordinates
 ): PrayerTimes {
   // These are mock times - replace with actual calculation or API call

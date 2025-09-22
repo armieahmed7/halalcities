@@ -67,7 +67,7 @@ export class NumbeoSource implements DataSource {
     try {
       // Note: This is a mock implementation
       // Real implementation would require Numbeo API key
-      const mockData = {
+      const mockData: { [key: string]: { monthlyBudget: number; rentIndex: number; foodIndex: number } } = {
         'London': { monthlyBudget: 3500, rentIndex: 85, foodIndex: 75 },
         'Dubai': { monthlyBudget: 2800, rentIndex: 65, foodIndex: 60 },
         'Istanbul': { monthlyBudget: 1200, rentIndex: 25, foodIndex: 30 },

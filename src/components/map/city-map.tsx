@@ -3,28 +3,10 @@
 import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { City } from '@/types/city'
 
 // Mapbox public token (you can replace with your own)
 mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
-
-interface City {
-  id: string
-  name: string
-  country: string
-  coordinates: {
-    lat: number
-    lng: number
-  }
-  scores: {
-    halal: number
-    overall: number
-  }
-  stats: {
-    mosquesCount: number
-    halalRestaurants: number
-    monthlyBudget: number
-  }
-}
 
 interface CityMapProps {
   cities: City[]
@@ -100,7 +82,7 @@ export function CityMap({ cities, onCityClick }: CityMapProps) {
         <div class="p-2">
           <h3 class="font-bold text-lg">${city.name}, ${city.country}</h3>
           <div class="text-sm mt-1">
-            <div>🕌 ${city.stats.mosquesCount} mosques</div>
+            <div>🕌 ${city.stats.mosques} mosques</div>
             <div>🍽️ ${city.stats.halalRestaurants} halal restaurants</div>
             <div>💰 $${city.stats.monthlyBudget}/mo</div>
             <div class="mt-1 font-semibold text-green-600">Halal Score: ${city.scores.halal}%</div>

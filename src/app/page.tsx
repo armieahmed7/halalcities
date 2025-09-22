@@ -6,41 +6,7 @@ import { CityCard } from "@/components/city/city-card"
 import { CityMap } from "@/components/map/city-map"
 import { Button } from "@/components/ui/button"
 import { Search, Map, Grid3x3 } from "lucide-react"
-
-interface City {
-  id: string
-  slug: string
-  name: string
-  country: string
-  primaryImage: string
-  coordinates: {
-    lat: number
-    lng: number
-  }
-  scores: {
-    halal: number
-    muslimPopulationPercent: number
-    food: number
-    community: number
-    cost: number
-    internet: number
-    safety: number
-    overall: number
-  }
-  stats: {
-    muslimPopulation: number
-    mosques: number
-    halalRestaurants: number
-    monthlyBudget: number
-    internetSpeed: number
-  }
-  features: {
-    airportPrayerRoom: boolean
-    halalHotels: number
-    islamicBanks: boolean
-    islamicSchools: number
-  }
-}
+import { City } from "@/types/city"
 
 export default function HomePage() {
   const router = useRouter()
@@ -254,13 +220,7 @@ export default function HomePage() {
         /* Map View */
         <div className="h-[600px] mb-12">
           <CityMap 
-            cities={sortedCities.map(city => ({
-              ...city,
-              stats: {
-                ...city.stats,
-                mosquesCount: city.stats.mosques
-              }
-            }))} 
+            cities={sortedCities} 
             onCityClick={handleCityClick}
           />
         </div>

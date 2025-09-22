@@ -51,6 +51,20 @@ export async function GET(request: Request) {
       }
     })
     
+    // If no cities found in database, use mock data
+    if (cities.length === 0) {
+      const { cities: mockCities } = await import('@/data/cities')
+      console.log('No cities in database, using mock data')
+      return NextResponse.json({
+        cities: mockCities.slice(offset, offset + limit),
+        total: mockCities.length,
+        limit,
+        offset,
+        hasMore: offset + limit < mockCities.length,
+        usingMockData: true
+      })
+    }
+    
     // Transform data to match our frontend format
     const transformedCities = cities.map(city => ({
       id: city.id,

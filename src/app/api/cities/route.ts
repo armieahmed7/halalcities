@@ -97,9 +97,10 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error fetching cities:', error)
     
-    // If database is not connected, fallback to mock data
-    if (error instanceof Error && error.message.includes('P1001')) {
+    // Always fallback to mock data if there's any database error
+    try {
       const { cities } = await import('@/data/cities')
+      console.log('Using mock data fallback')
       return NextResponse.json({
         cities: cities.slice(0, 20),
         total: cities.length,
@@ -108,11 +109,12 @@ export async function GET(request: Request) {
         hasMore: false,
         usingMockData: true
       })
+    } catch (importError) {
+      console.error('Error loading mock data:', importError)
+      return NextResponse.json(
+        { error: 'Failed to fetch cities', details: error instanceof Error ? error.message : 'Unknown error' },
+        { status: 500 }
+      )
     }
-    
-    return NextResponse.json(
-      { error: 'Failed to fetch cities' },
-      { status: 500 }
-    )
   }
 }

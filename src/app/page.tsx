@@ -32,9 +32,21 @@ export default function HomePage() {
     try {
       const response = await fetch('/api/cities')
       const data = await response.json()
+      
+      if (!response.ok) {
+        console.error('API Error:', data)
+        throw new Error(data.error || 'Failed to fetch cities')
+      }
+      
+      console.log('Fetched data:', data)
       setCities(data.cities || [])
+      
+      if (data.usingMockData) {
+        console.log('Using mock data')
+      }
     } catch (error) {
       console.error('Error fetching cities:', error)
+      setCities([])
     } finally {
       setLoading(false)
     }
@@ -197,6 +209,11 @@ export default function HomePage() {
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
           <p className="mt-4 text-gray-600">Loading cities...</p>
+        </div>
+      ) : cities.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-600 mb-4">No cities available at the moment.</p>
+          <p className="text-sm text-gray-500">Please check your connection or try refreshing the page.</p>
         </div>
       ) : viewMode === 'grid' ? (
         <>

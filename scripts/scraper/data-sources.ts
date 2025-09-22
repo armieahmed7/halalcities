@@ -1,6 +1,17 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
+// Type definitions
+interface PrayerTimings {
+  Fajr: string;
+  Sunrise: string;
+  Dhuhr: string;
+  Asr: string;
+  Maghrib: string;
+  Isha: string;
+  [key: string]: string;
+}
+
 // Interface for external data sources
 export interface DataSource {
   name: string;
@@ -89,7 +100,7 @@ export class AladhanSource implements DataSource {
         }
       );
       
-      const timings = response.data.data.timings;
+      const timings: PrayerTimings = response.data.data.timings;
       return {
         fajr: timings.Fajr,
         sunrise: timings.Sunrise,
@@ -151,7 +162,7 @@ export class MuslimPopulationSource implements DataSource {
   async fetchData(city: string, country: string) {
     // This would ideally fetch from a demographic API or database
     // For now, using country-level estimates
-    const countryData: Record<string, { percentage: number, source: string }> = {
+    const countryData: { [key: string]: { percentage: number, source: string } } = {
       'USA': { percentage: 1.1, source: 'Pew Research 2024' },
       'UK': { percentage: 6.3, source: 'ONS 2024' },
       'France': { percentage: 8.8, source: 'INSEE 2024' },

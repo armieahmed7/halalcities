@@ -1,13 +1,53 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { CityCard } from "@/components/city/city-card"
+import { CityMap } from "@/components/map/city-map"
 import { Button } from "@/components/ui/button"
-import { cities } from "@/data/cities"
-import { Search } from "lucide-react"
+import { Search, Map, Grid3x3 } from "lucide-react"
+
+interface City {
+  id: string
+  slug: string
+  name: string
+  country: string
+  primaryImage: string
+  coordinates: {
+    lat: number
+    lng: number
+  }
+  scores: {
+    halal: number
+    muslimPopulationPercent: number
+    food: number
+    community: number
+    cost: number
+    internet: number
+    safety: number
+    overall: number
+  }
+  stats: {
+    muslimPopulation: number
+    mosques: number
+    halalRestaurants: number
+    monthlyBudget: number
+    internetSpeed: number
+  }
+  features: {
+    airportPrayerRoom: boolean
+    halalHotels: number
+    islamicBanks: boolean
+    islamicSchools: number
+  }
+}
 
 export default function HomePage() {
+  const router = useRouter()
+  const [cities, setCities] = useState<City[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
   const [filters, setFilters] = useState({
     safe: true,
     halalFood: true,
@@ -15,6 +55,24 @@ export default function HomePage() {
     community: true,
     budget: "all"
   })
+  const [sortBy, setSortBy] = useState("halal")
+
+  // Fetch cities from API
+  useEffect(() => {
+    fetchCities()
+  }, [])
+
+  const fetchCities = async () => {
+    try {
+      const response = await fetch('/api/cities')
+      const data = await response.json()
+      setCities(data.cities || [])
+    } catch (error) {
+      console.error('Error fetching cities:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Filter cities based on search and filters
   const filteredCities = cities.filter(city => {
@@ -28,6 +86,26 @@ export default function HomePage() {
     
     return matchesSearch && matchesBudget
   })
+
+  // Sort cities
+  const sortedCities = [...filteredCities].sort((a, b) => {
+    switch (sortBy) {
+      case 'halal':
+        return b.scores.halal - a.scores.halal
+      case 'cost':
+        return a.stats.monthlyBudget - b.stats.monthlyBudget
+      case 'muslim':
+        return b.scores.muslimPopulationPercent - a.scores.muslimPopulationPercent
+      case 'safety':
+        return b.scores.safety - a.scores.safety
+      default:
+        return 0
+    }
+  })
+
+  const handleCityClick = (city: City) => {
+    router.push(`/city/${city.slug}`)
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -107,33 +185,86 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Sort Options */}
+        {/* View Toggle and Sort Options */}
         <div className="flex items-center justify-between mb-6">
-          <div className="text-sm text-gray-600">
-            Showing {filteredCities.length} cities
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600">
+              Showing {sortedCities.length} cities
+            </div>
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="gap-2"
+              >
+                <Grid3x3 className="h-4 w-4" />
+                Grid
+              </Button>
+              <Button
+                variant={viewMode === 'map' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('map')}
+                className="gap-2"
+              >
+                <Map className="h-4 w-4" />
+                Map
+              </Button>
+            </div>
           </div>
-          <select className="px-4 py-2 border border-gray-300 rounded text-sm">
-            <option>Sort by: Halal Score ↓</option>
-            <option>Sort by: Cost ↑</option>
-            <option>Sort by: Muslim Population ↓</option>
-            <option>Sort by: Safety ↓</option>
+          
+          <select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded text-sm"
+          >
+            <option value="halal">Sort by: Halal Score ↓</option>
+            <option value="cost">Sort by: Cost ↑</option>
+            <option value="muslim">Sort by: Muslim Population ↓</option>
+            <option value="safety">Sort by: Safety ↓</option>
           </select>
         </div>
       </div>
 
-      {/* City Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {filteredCities.map((city) => (
-          <CityCard key={city.id} city={city} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+          <p className="mt-4 text-gray-600">Loading cities...</p>
+        </div>
+      ) : viewMode === 'grid' ? (
+        <>
+          {/* City Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {sortedCities.slice(0, 18).map((city) => (
+              <CityCard key={city.id} city={city} />
+            ))}
+          </div>
 
-      {/* Load More */}
-      <div className="text-center">
-        <Button variant="outline" size="lg">
-          Load More Cities
-        </Button>
-      </div>
+          {/* Load More */}
+          {sortedCities.length > 18 && (
+            <div className="text-center">
+              <Button variant="outline" size="lg">
+                Load More Cities
+              </Button>
+            </div>
+          )}
+        </>
+      ) : (
+        /* Map View */
+        <div className="h-[600px] mb-12">
+          <CityMap 
+            cities={sortedCities.map(city => ({
+              ...city,
+              stats: {
+                ...city.stats,
+                mosquesCount: city.stats.mosques
+              }
+            }))} 
+            onCityClick={handleCityClick}
+          />
+        </div>
+      )}
 
       {/* Category Pills */}
       <div className="mt-16 border-t pt-8">

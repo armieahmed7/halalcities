@@ -37,15 +37,22 @@ export default function HomePage() {
   const fetchCities = async () => {
     try {
       const response = await fetch('/api/cities')
-      const data = await response.json()
       
       if (!response.ok) {
-        console.error('API Error:', data)
-        throw new Error(data.error || 'Failed to fetch cities')
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('API Error:', errorData)
+        throw new Error(errorData.error || 'Failed to fetch cities')
       }
       
+      const data = await response.json()
       console.log('Fetched data:', data)
-      setCities(data.cities || [])
+      
+      if (data && Array.isArray(data.cities)) {
+        setCities(data.cities)
+      } else {
+        console.warn('Invalid data format received:', data)
+        setCities([])
+      }
     } catch (error) {
       console.error('Error fetching cities:', error)
       setCities([])

@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import { Icon } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -8,12 +7,18 @@ import { City } from '@/types/city'
 
 // Fix for default markers in React-Leaflet
 import L from 'leaflet'
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-})
+
+// Fix the default icon issue with Leaflet in React
+if (typeof window !== 'undefined') {
+  // @ts-expect-error - accessing private property for Leaflet fix
+  delete L.Icon.Default.prototype._getIconUrl;
+  
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  });
+}
 
 interface CityMapProps {
   cities: City[]
@@ -33,13 +38,11 @@ export function CityMapLeaflet({ cities, onCityClick }: CityMapProps) {
   const getMarkerIcon = (halalScore: number) => {
     const color = halalScore >= 90 ? '#10b981' : halalScore >= 70 ? '#f59e0b' : '#6b7280'
     
+    const svgString = `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><circle cx="15" cy="15" r="15" fill="${color}"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="white" font-size="16" font-weight="bold">🕌</text></svg>`;
+    const svgBase64 = typeof window !== 'undefined' ? btoa(svgString) : '';
+    
     return new Icon({
-      iconUrl: `data:image/svg+xml;base64,${btoa(`
-        <svg width="30" height="30" viewBox="0 0 30 30" fill="${color}" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="15" cy="15" r="15" fill="${color}"/>
-          <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="white" font-size="16" font-weight="bold">🕌</text>
-        </svg>
-      `)}`,
+      iconUrl: `data:image/svg+xml;base64,${svgBase64}`,
       iconSize: [30, 30],
       iconAnchor: [15, 15],
       popupAnchor: [0, -15],

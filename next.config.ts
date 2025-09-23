@@ -5,10 +5,8 @@ const nextConfig: NextConfig = {
     domains: ['images.unsplash.com'],
     unoptimized: true, // For Netlify deployment
   },
-  // Disable Turbopack for production builds
-  experimental: {
-    // Remove turbopack from production
-  },
+  // For Netlify deployment with API routes
+  output: 'standalone',
 };
 
 export default nextConfig;

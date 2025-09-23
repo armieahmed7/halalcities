@@ -8,6 +8,12 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Seeding database...')
 
+  // Clear existing data first
+  await prisma.mosque.deleteMany()
+  await prisma.restaurant.deleteMany()
+  await prisma.city.deleteMany()
+  console.log('🧹 Cleared existing data')
+
   // Seed cities
   for (const city of cities) {
     const createdCity = await prisma.city.create({

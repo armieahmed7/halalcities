@@ -1,5 +1,4 @@
 [build]
-  base = "halalcities-app"
   command = "npm run build"
   publish = ".next"
 

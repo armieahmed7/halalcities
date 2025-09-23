@@ -51,17 +51,15 @@ export async function GET(request: Request) {
       }
     })
     
-    // If no cities found in database, use mock data
+    // If no cities found in database, return empty array
     if (cities.length === 0) {
-      const { cities: mockCities } = await import('@/data/cities')
-      console.log('No cities in database, using mock data')
+      console.log('No cities found in database')
       return NextResponse.json({
-        cities: mockCities.slice(offset, offset + limit),
-        total: mockCities.length,
+        cities: [],
+        total: 0,
         limit,
         offset,
-        hasMore: offset + limit < mockCities.length,
-        usingMockData: true
+        hasMore: false
       })
     }
     
@@ -110,25 +108,9 @@ export async function GET(request: Request) {
     })
   } catch (error) {
     console.error('Error fetching cities:', error)
-    
-    // Always fallback to mock data if there's any database error
-    try {
-      const { cities } = await import('@/data/cities')
-      console.log('Using mock data fallback')
-      return NextResponse.json({
-        cities: cities.slice(0, 20),
-        total: cities.length,
-        limit: 20,
-        offset: 0,
-        hasMore: false,
-        usingMockData: true
-      })
-    } catch (importError) {
-      console.error('Error loading mock data:', importError)
-      return NextResponse.json(
-        { error: 'Failed to fetch cities', details: error instanceof Error ? error.message : 'Unknown error' },
-        { status: 500 }
-      )
-    }
+    return NextResponse.json(
+      { error: 'Failed to fetch cities', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
   }
 }

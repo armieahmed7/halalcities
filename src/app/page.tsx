@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { CityCard } from "@/components/city/city-card"
-import { CityMap } from "@/components/map/city-map"
+import dynamic from 'next/dynamic'
+
+// Dynamically import the map to avoid SSR issues with Leaflet
+const CityMap = dynamic(
+  () => import("@/components/map/city-map-leaflet").then((mod) => mod.CityMapLeaflet),
+  { ssr: false }
+)
 import { Button } from "@/components/ui/button"
 import { Search, Map, Grid3x3 } from "lucide-react"
 import { City } from "@/types/city"
@@ -40,10 +46,6 @@ export default function HomePage() {
       
       console.log('Fetched data:', data)
       setCities(data.cities || [])
-      
-      if (data.usingMockData) {
-        console.log('Using mock data')
-      }
     } catch (error) {
       console.error('Error fetching cities:', error)
       setCities([])

@@ -295,14 +295,14 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleCities.map((city, index) => (
                 <div
-                  key={city.id}
+                  key={city.slug}
                   className="animate-fade-in"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <CityCard
                     city={city}
                     onFavorite={handleFavorite}
-                    isFavorited={favorites.includes(city.id)}
+                    isFavorited={favorites.includes(city.slug)}
                   />
                 </div>
               ))}
@@ -352,7 +352,7 @@ export default function HomePage() {
               <tbody>
                 {visibleCities.map((city) => (
                   <tr
-                    key={city.id}
+                    key={city.slug}
                     className="border-b border-[var(--border)] hover:bg-[var(--background-secondary)] cursor-pointer transition-colors"
                     onClick={() => handleCityClick(city)}
                   >

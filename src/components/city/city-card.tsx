@@ -41,7 +41,7 @@ export function CityCard({ city, onFavorite, isFavorited = false }: CityCardProp
   const handleFavorite = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    onFavorite?.(city.id)
+    onFavorite?.(city.slug)
   }
 
   return (

@@ -1,94 +1,51 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
+import { cities } from "@/data/cities"
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
 
     // Get query parameters
-    const search = searchParams.get("search")
+    const search = searchParams.get("search")?.toLowerCase()
     const minHalal = searchParams.get("minHalal")
     const maxBudget = searchParams.get("maxBudget")
-    const limit = parseInt(searchParams.get("limit") || "50")
+    const limit = parseInt(searchParams.get("limit") || "200") // Default to 200 to get all cities
     const offset = parseInt(searchParams.get("offset") || "0")
 
-    // Build where clause
-    const where: Prisma.CityWhereInput = {}
+    // Start with all cities
+    let filteredCities = [...cities]
 
+    // Apply search filter
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { country: { contains: search, mode: 'insensitive' } }
-      ]
+      filteredCities = filteredCities.filter(city =>
+        city.name.toLowerCase().includes(search) ||
+        city.country.toLowerCase().includes(search)
+      )
     }
 
+    // Apply halal score filter
     if (minHalal) {
-      where.halalScore = { gte: parseInt(minHalal) }
+      const minHalalScore = parseInt(minHalal)
+      filteredCities = filteredCities.filter(city => city.scores.halal >= minHalalScore)
     }
 
+    // Apply budget filter
     if (maxBudget) {
-      where.monthlyBudget = { lte: parseInt(maxBudget) }
+      const maxBudgetNum = parseInt(maxBudget)
+      filteredCities = filteredCities.filter(city => city.stats.monthlyBudget <= maxBudgetNum)
     }
 
-    // Get total count for pagination
-    const total = await prisma.city.count({ where })
+    // Sort by overall score (descending)
+    filteredCities.sort((a, b) => b.scores.overall - a.scores.overall)
 
-    // Get cities with pagination
-    const cities = await prisma.city.findMany({
-      where,
-      orderBy: { overallScore: 'desc' },
-      take: limit,
-      skip: offset,
-      include: {
-        _count: {
-          select: {
-            restaurants: true,
-            mosques: true,
-            reviews: true
-          }
-        }
-      }
-    })
+    // Get total count before pagination
+    const total = filteredCities.length
 
-    // Transform data to match our frontend format
-    const transformedCities = cities.map(city => ({
-      id: city.id,
-      slug: city.slug,
-      name: city.name,
-      country: city.country,
-      primaryImage: city.primaryImage,
-      coordinates: {
-        lat: city.lat,
-        lng: city.lng
-      },
-      scores: {
-        halal: city.halalScore,
-        muslimPopulationPercent: city.muslimPopulationPercent,
-        food: city.foodScore,
-        community: city.communityScore,
-        cost: city.costScore,
-        internet: city.internetScore,
-        safety: city.safetyScore,
-        overall: city.overallScore
-      },
-      stats: {
-        muslimPopulation: city.muslimPopulation,
-        mosques: city.mosquesCount,
-        halalRestaurants: city.halalRestaurants,
-        monthlyBudget: city.monthlyBudget,
-        internetSpeed: city.internetSpeed
-      },
-      features: {
-        airportPrayerRoom: city.airportPrayerRoom,
-        halalHotels: city.halalHotels,
-        islamicBanks: city.islamicBanks,
-        islamicSchools: city.islamicSchools
-      }
-    }))
+    // Apply pagination
+    const paginatedCities = filteredCities.slice(offset, offset + limit)
 
     return NextResponse.json({
-      cities: transformedCities,
+      cities: paginatedCities,
       total,
       limit,
       offset,

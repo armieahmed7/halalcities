@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "bangkok-thailand",
+    "url": "https://nomads.com/bangkok-thailand",
+    "scrapedAt": "2025-12-07T22:37:00.843Z",
+    "totalScore": 4.42,
+    "reviewCount": 4119,
+    "rank": 1,
+    "qualityOfLife": null,
+    "familyScore": "Okay",
+    "communityScore": "Great",
+    "costs": {
+      "nomadMonthly": null,
+      "expatMonthly": null,
+      "localMonthly": null
+    },
+    "internetSpeed": 24,
+    "temperatureC": 30,
+    "safety": {
+      "overall": null,
+      "women": null,
+      "lgbtq": null
+    },
+    "population": null
+  },
+  {
+    "slug": "lisbon-portugal",
+    "url": "https://nomads.com/lisbon-portugal",
+    "scrapedAt": "2025-12-07T22:37:06.028Z",
+    "totalScore": 2.84,
+    "reviewCount": 3571,
+    "rank": 4,
+    "qualityOfLife": null,
+    "familyScore": "Okay",
+    "communityScore": "Good",
+    "costs": {
+      "nomadMonthly": null,
+      "expatMonthly": null,
+      "localMonthly": null
+    },
+    "internetSpeed": 74,
+    "temperatureC": 15,
+    "safety": {
+      "overall": null,
+      "women": null,
+      "lgbtq": null
+    },
+    "population": null
+  },
+  {
+    "slug": "dubai-united-arab-emirates",
+    "url": "https://nomads.com/dubai-united-arab-emirates",
+    "scrapedAt": "2025-12-07T22:37:10.759Z",
+    "totalScore": 2.56,
+    "reviewCount": 1721,
+    "rank": 8,
+    "qualityOfLife": null,
+    "familyScore": "Okay",
+    "communityScore": "Good",
+    "costs": {
+      "nomadMonthly": null,
+      "expatMonthly": null,
+      "localMonthly": null
+    },
+    "internetSpeed": 11,
+    "temperatureC": 27,
+    "safety": {
+      "overall": null,
+      "women": null,
+      "lgbtq": null
+    },
+    "population": null
+  },
+  {
+    "slug": "tokyo-japan",
+    "url": "https://nomads.com/tokyo-japan",
+    "scrapedAt": "2025-12-07T22:37:15.907Z",
+    "totalScore": 2.5,
+    "reviewCount": 2193,
+    "rank": 13,
+    "qualityOfLife": null,
+    "familyScore": "Okay",
+    "communityScore": "Okay",
+    "costs": {
+      "nomadMonthly": null,
+      "expatMonthly": null,
+      "localMonthly": null
+    },
+    "internetSpeed": 27,
+    "temperatureC": 12,
+    "safety": {
+      "overall": null,
+      "women": null,
+      "lgbtq": null
+    },
+    "population": null
+  },
+  {
+    "slug": "new-york-city-ny-united-states",
+    "url": "https://nomads.com/new-york-city-ny-united-states",
+    "scrapedAt": "2025-12-07T22:37:20.703Z",
+    "totalScore": 2.23,
+    "reviewCount": 2799,
+    "rank": 109,
+    "qualityOfLife": null,
+    "familyScore": "Good",
+    "communityScore": "Okay",
+    "costs": {
+      "nomadMonthly": null,
+      "expatMonthly": null,
+      "localMonthly": null
+    },
+    "internetSpeed": 34,
+    "temperatureC": 4,
+    "safety": {
+      "overall": null,
+      "women": null,
+      "lgbtq": null
+    },
+    "population": null
+  }
+]

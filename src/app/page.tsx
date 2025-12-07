@@ -1,35 +1,46 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { CityCard } from "@/components/city/city-card"
 import dynamic from 'next/dynamic'
+import Image from "next/image"
 
-// Dynamically import the map to avoid SSR issues with Leaflet
+// Components
+import { HeroSection } from "@/components/home/hero-section"
+import { FilterBar, ViewMode, SortOption } from "@/components/home/filter-bar"
+import { FilterDrawer, FilterState, defaultFilters } from "@/components/home/filter-drawer"
+import { CityCard } from "@/components/city/city-card"
+import { Button } from "@/components/ui/button"
+import { City } from "@/types/city"
+
+// Dynamic imports for map (avoid SSR issues)
 const CityMap = dynamic(
   () => import("@/components/map/city-map-leaflet").then((mod) => mod.CityMapLeaflet),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[600px] bg-[var(--background-secondary)] rounded-xl flex items-center justify-center">
+        <div className="text-[var(--foreground-muted)]">Loading map...</div>
+      </div>
+    )
+  }
 )
-import { Button } from "@/components/ui/button"
-import { Search, Map, Grid3x3 } from "lucide-react"
-import { City } from "@/types/city"
 
 export default function HomePage() {
   const router = useRouter()
+
+  // State
   const [cities, setCities] = useState<City[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
-  const [filters, setFilters] = useState({
-    safe: true,
-    halalFood: true,
-    mosques: true,
-    community: true,
-    budget: "all"
-  })
-  const [sortBy, setSortBy] = useState("halal")
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [sortBy, setSortBy] = useState<SortOption>('overall')
+  const [filters, setFilters] = useState<FilterState>(defaultFilters)
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(12)
+  const [favorites, setFavorites] = useState<string[]>([])
 
-  // Fetch cities from API
+  // Fetch cities
   useEffect(() => {
     fetchCities()
   }, [])
@@ -37,20 +48,16 @@ export default function HomePage() {
   const fetchCities = async () => {
     try {
       const response = await fetch('/api/cities')
-      
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        console.error('API Error:', errorData)
-        throw new Error(errorData.error || 'Failed to fetch cities')
+        throw new Error('Failed to fetch cities')
       }
-      
+
       const data = await response.json()
-      console.log('Fetched data:', data)
-      
+
       if (data && Array.isArray(data.cities)) {
         setCities(data.cities)
       } else {
-        console.warn('Invalid data format received:', data)
         setCities([])
       }
     } catch (error) {
@@ -61,208 +68,368 @@ export default function HomePage() {
     }
   }
 
-  // Filter cities based on search and filters
-  const filteredCities = cities.filter(city => {
-    const matchesSearch = city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         city.country.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesBudget = filters.budget === "all" || 
-                         (filters.budget === "1k" && city.stats.monthlyBudget < 1000) ||
-                         (filters.budget === "2k" && city.stats.monthlyBudget < 2000) ||
-                         (filters.budget === "3k" && city.stats.monthlyBudget < 3000)
-    
-    return matchesSearch && matchesBudget
-  })
+  // Get active filter labels
+  const activeFilterLabels = useMemo(() => {
+    const labels: string[] = []
 
-  // Sort cities
-  const sortedCities = [...filteredCities].sort((a, b) => {
-    switch (sortBy) {
-      case 'halal':
-        return b.scores.halal - a.scores.halal
-      case 'cost':
-        return a.stats.monthlyBudget - b.stats.monthlyBudget
-      case 'muslim':
-        return b.scores.muslimPopulationPercent - a.scores.muslimPopulationPercent
-      case 'safety':
-        return b.scores.safety - a.scores.safety
-      default:
-        return 0
+    if (filters.halalScore[0] > 0 || filters.halalScore[1] < 100) {
+      labels.push(`Halal ${filters.halalScore[0]}-${filters.halalScore[1]}`)
     }
-  })
+    if (filters.mosqueDensity.length > 0) {
+      labels.push(...filters.mosqueDensity)
+    }
+    if (filters.muslimPopulation.length > 0) {
+      labels.push(...filters.muslimPopulation)
+    }
+    if (filters.airportPrayerRoom === true) labels.push('Airport Prayer')
+    if (filters.islamicBanks === true) labels.push('Islamic Banks')
+    if (filters.budget[0] > 0 || filters.budget[1] < 5000) {
+      labels.push(`$${filters.budget[0]}-$${filters.budget[1]}`)
+    }
+    if (filters.safety.length > 0) {
+      labels.push(...filters.safety)
+    }
+    if (filters.continent.length > 0) {
+      labels.push(...filters.continent)
+    }
+    if (filters.familyFriendly === true) labels.push('Family Friendly')
+    if (filters.womenFriendly === true) labels.push('Women Friendly')
+
+    return labels
+  }, [filters])
+
+  // Filter and sort cities
+  const filteredAndSortedCities = useMemo(() => {
+    let result = [...cities]
+
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter(city =>
+        city.name.toLowerCase().includes(query) ||
+        city.country.toLowerCase().includes(query)
+      )
+    }
+
+    // Apply filters
+    // Halal score
+    result = result.filter(city =>
+      city.scores.halal >= filters.halalScore[0] &&
+      city.scores.halal <= filters.halalScore[1]
+    )
+
+    // Budget
+    result = result.filter(city =>
+      city.stats.monthlyBudget >= filters.budget[0] &&
+      city.stats.monthlyBudget <= filters.budget[1]
+    )
+
+    // Muslim population
+    if (filters.muslimPopulation.length > 0 && !filters.muslimPopulation.includes('Any')) {
+      result = result.filter(city => {
+        const percent = city.scores.muslimPopulationPercent
+        if (filters.muslimPopulation.includes('Majority (50%+)') && percent >= 50) return true
+        if (filters.muslimPopulation.includes('Significant (20%+)') && percent >= 20) return true
+        if (filters.muslimPopulation.includes('Minority (5%+)') && percent >= 5) return true
+        return false
+      })
+    }
+
+    // Safety
+    if (filters.safety.length > 0 && !filters.safety.includes('Any')) {
+      result = result.filter(city => {
+        const score = city.scores.safety
+        if (filters.safety.includes('Very Safe (90+)') && score >= 90) return true
+        if (filters.safety.includes('Safe (70+)') && score >= 70) return true
+        if (filters.safety.includes('Moderate (50+)') && score >= 50) return true
+        return false
+      })
+    }
+
+    // Airport prayer room
+    if (filters.airportPrayerRoom === true) {
+      result = result.filter(city => city.features.airportPrayerRoom)
+    } else if (filters.airportPrayerRoom === false) {
+      result = result.filter(city => !city.features.airportPrayerRoom)
+    }
+
+    // Islamic banks
+    if (filters.islamicBanks === true) {
+      result = result.filter(city => city.features.islamicBanks)
+    } else if (filters.islamicBanks === false) {
+      result = result.filter(city => !city.features.islamicBanks)
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'overall':
+          return b.scores.overall - a.scores.overall
+        case 'halal':
+          return b.scores.halal - a.scores.halal
+        case 'cost':
+          return a.stats.monthlyBudget - b.stats.monthlyBudget
+        case 'safety':
+          return b.scores.safety - a.scores.safety
+        case 'muslim':
+          return b.scores.muslimPopulationPercent - a.scores.muslimPopulationPercent
+        case 'internet':
+          return b.stats.internetSpeed - a.stats.internetSpeed
+        default:
+          return 0
+      }
+    })
+
+    return result
+  }, [cities, searchQuery, filters, sortBy])
+
+  // Handlers
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setVisibleCount(12)
+  }
 
   const handleCityClick = (city: City) => {
     router.push(`/city/${city.slug}`)
   }
 
+  const handleFavorite = (cityId: string) => {
+    setFavorites(prev =>
+      prev.includes(cityId)
+        ? prev.filter(id => id !== cityId)
+        : [...prev, cityId]
+    )
+  }
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 12)
+  }
+
+  const handleClearFilters = () => {
+    setFilters(defaultFilters)
+    setSearchQuery("")
+  }
+
+  const handleResetFilters = () => {
+    setFilters(defaultFilters)
+  }
+
+  const visibleCities = filteredAndSortedCities.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredAndSortedCities.length
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <main className="min-h-screen bg-[var(--background)]">
       {/* Hero Section */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">
-          🕌 Find your perfect Muslim-friendly city
-        </h1>
-        <p className="text-lg text-gray-600 mb-8">
-          Discover cities with halal food, mosques, and welcoming Muslim communities
-        </p>
+      <HeroSection
+        onSearch={handleSearch}
+        totalCities={cities.length || 500}
+        totalMosques={cities.reduce((acc, c) => acc + c.stats.mosques, 0) || 10000}
+        totalRestaurants={cities.reduce((acc, c) => acc + c.stats.halalRestaurants, 0) || 50000}
+      />
 
-        {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search cities..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-          </div>
-        </div>
+      {/* Filter Bar */}
+      <FilterBar
+        totalResults={filteredAndSortedCities.length}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        activeFilters={activeFilterLabels}
+        onClearFilters={handleClearFilters}
+        onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
+      />
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3 justify-center mb-8">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={filters.safe}
-              onChange={(e) => setFilters({...filters, safe: e.target.checked})}
-              className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-            />
-            <span className="text-sm">✅ Safe</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={filters.halalFood}
-              onChange={(e) => setFilters({...filters, halalFood: e.target.checked})}
-              className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-            />
-            <span className="text-sm">🍖 Halal Food</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={filters.mosques}
-              onChange={(e) => setFilters({...filters, mosques: e.target.checked})}
-              className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-            />
-            <span className="text-sm">🕌 Mosques</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={filters.community}
-              onChange={(e) => setFilters({...filters, community: e.target.checked})}
-              className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-            />
-            <span className="text-sm">👥 Community</span>
-          </label>
-          
-          <div className="border-l pl-3 ml-3">
-            <select
-              value={filters.budget}
-              onChange={(e) => setFilters({...filters, budget: e.target.value})}
-              className="px-3 py-1 border border-gray-300 rounded text-sm"
-            >
-              <option value="all">Any budget</option>
-              <option value="1k">&lt; $1k/mo</option>
-              <option value="2k">&lt; $2k/mo</option>
-              <option value="3k">&lt; $3k/mo</option>
-            </select>
-          </div>
-        </div>
-
-        {/* View Toggle and Sort Options */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-600">
-              Showing {sortedCities.length} cities
-            </div>
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="gap-2"
-              >
-                <Grid3x3 className="h-4 w-4" />
-                Grid
-              </Button>
-              <Button
-                variant={viewMode === 'map' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('map')}
-                className="gap-2"
-              >
-                <Map className="h-4 w-4" />
-                Map
-              </Button>
-            </div>
-          </div>
-          
-          <select 
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded text-sm"
-          >
-            <option value="halal">Sort by: Halal Score ↓</option>
-            <option value="cost">Sort by: Cost ↑</option>
-            <option value="muslim">Sort by: Muslim Population ↓</option>
-            <option value="safety">Sort by: Safety ↓</option>
-          </select>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-          <p className="mt-4 text-gray-600">Loading cities...</p>
-        </div>
-      ) : cities.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 mb-4">No cities available at the moment.</p>
-          <p className="text-sm text-gray-500">Please check your connection or try refreshing the page.</p>
-        </div>
-      ) : viewMode === 'grid' ? (
-        <>
-          {/* City Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {sortedCities.slice(0, 18).map((city) => (
-              <CityCard key={city.id} city={city} />
+      {/* Main Content */}
+      <section className="container py-8">
+        {loading ? (
+          // Loading State
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="rounded-2xl overflow-hidden">
+                <div className="h-48 skeleton" />
+                <div className="p-4 space-y-3 bg-[var(--card)] border border-[var(--border)] border-t-0 rounded-b-2xl">
+                  <div className="h-4 w-2/3 skeleton" />
+                  <div className="h-3 w-1/2 skeleton" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="h-10 skeleton" />
+                    <div className="h-10 skeleton" />
+                    <div className="h-10 skeleton" />
+                    <div className="h-10 skeleton" />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
-
-          {/* Load More */}
-          {sortedCities.length > 18 && (
-            <div className="text-center">
-              <Button variant="outline" size="lg">
-                Load More Cities
-              </Button>
+        ) : cities.length === 0 ? (
+          // Empty State
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🕌</div>
+            <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">
+              No cities available
+            </h2>
+            <p className="text-[var(--foreground-secondary)] mb-6">
+              We&apos;re working on adding more Muslim-friendly cities.
+              Check back soon!
+            </p>
+            <Button onClick={fetchCities}>
+              Refresh
+            </Button>
+          </div>
+        ) : filteredAndSortedCities.length === 0 ? (
+          // No Results
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🔍</div>
+            <h2 className="text-2xl font-bold text-[var(--foreground)] mb-2">
+              No cities match your filters
+            </h2>
+            <p className="text-[var(--foreground-secondary)] mb-6">
+              Try adjusting your filters or search query
+            </p>
+            <Button onClick={handleClearFilters}>
+              Clear All Filters
+            </Button>
+          </div>
+        ) : viewMode === 'grid' ? (
+          // Grid View
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {visibleCities.map((city, index) => (
+                <div
+                  key={city.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <CityCard
+                    city={city}
+                    onFavorite={handleFavorite}
+                    isFavorited={favorites.includes(city.id)}
+                  />
+                </div>
+              ))}
             </div>
-          )}
-        </>
-      ) : (
-        /* Map View */
-        <div className="h-[600px] mb-12">
-          <CityMap 
-            cities={sortedCities} 
-            onCityClick={handleCityClick}
-          />
-        </div>
-      )}
+
+            {/* Load More */}
+            {hasMore && (
+              <div className="text-center mt-12">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleLoadMore}
+                  className="px-8"
+                >
+                  Load More Cities
+                  <span className="ml-2 text-[var(--foreground-muted)]">
+                    ({filteredAndSortedCities.length - visibleCount} remaining)
+                  </span>
+                </Button>
+              </div>
+            )}
+          </>
+        ) : viewMode === 'map' ? (
+          // Map View
+          <div className="h-[600px] rounded-xl overflow-hidden border border-[var(--border)]">
+            <CityMap
+              cities={filteredAndSortedCities}
+              onCityClick={handleCityClick}
+            />
+          </div>
+        ) : (
+          // Table View
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-[var(--border)]">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--foreground)]">City</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--foreground)]">Country</th>
+                  <th className="text-center py-3 px-4 text-sm font-semibold text-[var(--foreground)]">Overall</th>
+                  <th className="text-center py-3 px-4 text-sm font-semibold text-[var(--foreground)]">Halal</th>
+                  <th className="text-center py-3 px-4 text-sm font-semibold text-[var(--foreground)]">Safety</th>
+                  <th className="text-center py-3 px-4 text-sm font-semibold text-[var(--foreground)]">Muslim %</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-[var(--foreground)]">Cost/mo</th>
+                  <th className="text-center py-3 px-4 text-sm font-semibold text-[var(--foreground)]">Internet</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleCities.map((city) => (
+                  <tr
+                    key={city.id}
+                    className="border-b border-[var(--border)] hover:bg-[var(--background-secondary)] cursor-pointer transition-colors"
+                    onClick={() => handleCityClick(city)}
+                  >
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-10 h-10">
+                          <Image
+                            src={city.primaryImage}
+                            alt={city.name}
+                            fill
+                            className="rounded-lg object-cover"
+                          />
+                        </div>
+                        <span className="font-medium text-[var(--foreground)]">{city.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-[var(--foreground-secondary)]">{city.country}</td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${
+                        city.scores.overall >= 85 ? 'bg-green-100 text-green-700' :
+                        city.scores.overall >= 70 ? 'bg-lime-100 text-lime-700' :
+                        'bg-amber-100 text-amber-700'
+                      }`}>
+                        {city.scores.overall}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center text-[var(--foreground)]">{city.scores.halal}</td>
+                    <td className="py-3 px-4 text-center text-[var(--foreground)]">{city.scores.safety}</td>
+                    <td className="py-3 px-4 text-center text-[var(--foreground)]">{city.scores.muslimPopulationPercent}%</td>
+                    <td className="py-3 px-4 text-right text-[var(--foreground)]">${city.stats.monthlyBudget.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-center text-[var(--foreground)]">{city.stats.internetSpeed} Mbps</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {hasMore && (
+              <div className="text-center mt-8">
+                <Button variant="outline" onClick={handleLoadMore}>
+                  Load More
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
 
       {/* Category Pills */}
-      <div className="mt-16 border-t pt-8">
-        <div className="flex flex-wrap gap-3 justify-center">
-          <Button variant="outline" size="sm">📊 Top Ranked</Button>
-          <Button variant="outline" size="sm">🕌 Most Mosques</Button>
-          <Button variant="outline" size="sm">🍖 Best Halal Food</Button>
-          <Button variant="outline" size="sm">👨‍👩‍👧‍👦 Family Friendly</Button>
-          <Button variant="outline" size="sm">💼 Business Hubs</Button>
-          <Button variant="outline" size="sm">🏖️ Vacation</Button>
+      <section className="container pb-16">
+        <div className="border-t border-[var(--border)] pt-8">
+          <h2 className="text-lg font-semibold text-[var(--foreground)] mb-4 text-center">
+            Popular Categories
+          </h2>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <button className="filter-chip">📊 Top Ranked</button>
+            <button className="filter-chip">🕌 Most Mosques</button>
+            <button className="filter-chip">🍖 Best Halal Food</button>
+            <button className="filter-chip">👨‍👩‍👧‍👦 Family Friendly</button>
+            <button className="filter-chip">💼 Business Hubs</button>
+            <button className="filter-chip">🏖️ Beach Cities</button>
+            <button className="filter-chip">🏔️ Mountain Retreats</button>
+            <button className="filter-chip">💰 Budget Friendly</button>
+            <button className="filter-chip">📶 Fast Internet</button>
+            <button className="filter-chip">🛡️ Very Safe</button>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onFiltersChange={setFilters}
+        onApply={() => setVisibleCount(12)}
+        onReset={handleResetFilters}
+      />
+    </main>
   )
 }

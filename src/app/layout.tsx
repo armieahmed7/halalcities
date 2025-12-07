@@ -4,11 +4,33 @@ import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "HalalCities - Find Your Perfect Muslim-Friendly City",
-  description: "Discover the best cities for Muslim travelers and expats with halal food, mosques, and vibrant communities",
+  description: "Discover the best cities for Muslim travelers and expats with halal food, mosques, and vibrant communities worldwide.",
+  keywords: ["halal travel", "muslim friendly cities", "halal food", "mosques", "islamic travel", "muslim expats"],
+  authors: [{ name: "HalalCities" }],
+  openGraph: {
+    title: "HalalCities - Find Your Perfect Muslim-Friendly City",
+    description: "Discover the best cities for Muslim travelers and expats with halal food, mosques, and vibrant communities worldwide.",
+    url: "https://halalcities.com",
+    siteName: "HalalCities",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HalalCities - Find Your Perfect Muslim-Friendly City",
+    description: "Discover the best cities for Muslim travelers and expats with halal food, mosques, and vibrant communities worldwide.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -17,13 +39,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased`}>
-        <Header />
-        <main className="min-h-screen bg-gray-50">
-          {children}
-        </main>
-        <Footer />
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased bg-[var(--background)] text-[var(--foreground)]`}>
+        <div className="flex min-h-screen flex-col">
+          <Header />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

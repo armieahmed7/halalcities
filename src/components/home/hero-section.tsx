@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { MapPin, Building2, Utensils, ChevronDown, Mail, ArrowRight, Check, Loader2 } from "lucide-react"
 import { SearchAutocomplete } from "@/components/search/search-autocomplete"
 
@@ -11,12 +11,22 @@ interface HeroSectionProps {
   totalRestaurants?: number
 }
 
+// Fixed target values for consistent display
+const DISPLAY_CITIES = 500
+const DISPLAY_MOSQUES = 10000
+const DISPLAY_RESTAURANTS = 50000
+
 export function HeroSection({
   onSearch,
-  totalCities = 500,
-  totalMosques = 10000,
-  totalRestaurants = 50000
+  totalCities = DISPLAY_CITIES,
+  totalMosques = DISPLAY_MOSQUES,
+  totalRestaurants = DISPLAY_RESTAURANTS
 }: HeroSectionProps) {
+  // Use fixed display values for consistent animation
+  const targetCities = totalCities > DISPLAY_CITIES ? totalCities : DISPLAY_CITIES
+  const targetMosques = totalMosques > DISPLAY_MOSQUES ? totalMosques : DISPLAY_MOSQUES
+  const targetRestaurants = totalRestaurants > DISPLAY_RESTAURANTS ? totalRestaurants : DISPLAY_RESTAURANTS
+
   const [animatedCities, setAnimatedCities] = useState(0)
   const [animatedMosques, setAnimatedMosques] = useState(0)
   const [animatedRestaurants, setAnimatedRestaurants] = useState(0)
@@ -24,9 +34,14 @@ export function HeroSection({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [error, setError] = useState("")
+  const hasAnimated = useRef(false)
 
-  // Animate numbers on mount
+  // Animate numbers once on mount
   useEffect(() => {
+    // Only animate once
+    if (hasAnimated.current) return
+    hasAnimated.current = true
+
     const duration = 2000
     const steps = 60
     const interval = duration / steps
@@ -37,15 +52,15 @@ export function HeroSection({
       const progress = step / steps
       const easeOut = 1 - Math.pow(1 - progress, 3)
 
-      setAnimatedCities(Math.floor(totalCities * easeOut))
-      setAnimatedMosques(Math.floor(totalMosques * easeOut))
-      setAnimatedRestaurants(Math.floor(totalRestaurants * easeOut))
+      setAnimatedCities(Math.floor(targetCities * easeOut))
+      setAnimatedMosques(Math.floor(targetMosques * easeOut))
+      setAnimatedRestaurants(Math.floor(targetRestaurants * easeOut))
 
       if (step >= steps) clearInterval(timer)
     }, interval)
 
     return () => clearInterval(timer)
-  }, [totalCities, totalMosques, totalRestaurants])
+  }, [targetCities, targetMosques, targetRestaurants])
 
   const scrollToContent = () => {
     window.scrollTo({

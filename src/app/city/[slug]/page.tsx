@@ -17,6 +17,7 @@ import { LocationMap } from "@/components/city/location-map"
 import { PrayerTimesWidget } from "@/components/city/prayer-times-widget"
 import { QiblaCompass } from "@/components/city/qibla-compass"
 import { RamadanGuide } from "@/components/city/ramadan-guide"
+import { HalalRestaurantsMap } from "@/components/city/halal-restaurants-map"
 import { Filter, MapPin, Users, Shield, Plane, Building2, Utensils, Info, Moon } from "lucide-react"
 
 export default function CityPage() {
@@ -516,6 +517,13 @@ export default function CityPage() {
                   <Button size="sm" variant="outline">Fast Food</Button>
                   <Button size="sm" variant="outline">Certified</Button>
                 </div>
+
+                {/* Interactive Restaurant Map */}
+                <HalalRestaurantsMap
+                  cityName={city.name}
+                  latitude={city.coordinates?.lat || 0}
+                  longitude={city.coordinates?.lng || 0}
+                />
 
                 <div className="space-y-4">
                   {restaurantsByCity[city.slug]?.map((restaurant) => (

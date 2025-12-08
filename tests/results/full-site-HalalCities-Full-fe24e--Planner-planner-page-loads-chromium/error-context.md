@@ -1,0 +1,253 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "🕌 HalalCities" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e6]: 🕌
+          - generic [ref=e7]: HalalCities
+        - navigation [ref=e8]:
+          - link "Cities" [ref=e9] [cursor=pointer]:
+            - /url: /
+            - img [ref=e10]
+            - text: Cities
+          - link "Mosques" [ref=e13] [cursor=pointer]:
+            - /url: /mosques
+            - img [ref=e14]
+            - text: Mosques
+          - link "Halal Food" [ref=e18] [cursor=pointer]:
+            - /url: /restaurants
+            - img [ref=e19]
+            - text: Halal Food
+          - link "Community" [ref=e22] [cursor=pointer]:
+            - /url: /community
+            - img [ref=e23]
+            - text: Community
+          - button "Tools" [ref=e28]:
+            - text: Tools
+            - img [ref=e29]
+        - generic [ref=e31]:
+          - button "Search cities... ⌘ K" [ref=e32]:
+            - img [ref=e33]
+            - generic [ref=e36]: Search cities...
+            - generic [ref=e37]:
+              - generic [ref=e38]: ⌘
+              - text: K
+          - button [ref=e39]:
+            - img [ref=e40]
+          - generic [ref=e42]:
+            - link "Log In" [ref=e43] [cursor=pointer]:
+              - /url: /login
+              - button "Log In" [ref=e44]
+            - link "Sign Up Free" [ref=e45] [cursor=pointer]:
+              - /url: /signup
+              - button "Sign Up Free" [ref=e46]
+    - main [ref=e47]:
+      - main [ref=e48]:
+        - generic [ref=e50]:
+          - link "Back to Cities" [ref=e51] [cursor=pointer]:
+            - /url: /
+            - img [ref=e52]
+            - text: Back to Cities
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - textbox "Name your trip..." [ref=e56]: My Muslim-Friendly Trip
+              - generic [ref=e57]:
+                - generic [ref=e58]:
+                  - img [ref=e59]
+                  - textbox [ref=e61]
+                - generic [ref=e62]:
+                  - img [ref=e63]
+                  - generic [ref=e66]: 0 destinations
+                - generic [ref=e67]:
+                  - img [ref=e68]
+                  - generic [ref=e71]: 0 days
+            - generic [ref=e72]:
+              - button "Export" [disabled]:
+                - img
+                - text: Export
+              - button "Share" [disabled]:
+                - img
+                - text: Share
+        - generic [ref=e74]:
+          - generic [ref=e76]:
+            - generic [ref=e77]: ✈️
+            - heading "Start Planning Your Trip" [level=2] [ref=e78]
+            - paragraph [ref=e79]: Add Muslim-friendly cities to build your perfect itinerary
+            - button "Add First Destination" [ref=e80]:
+              - img [ref=e81]
+              - text: Add First Destination
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - heading "Trip Summary" [level=3] [ref=e84]
+              - generic [ref=e85]:
+                - generic [ref=e86]:
+                  - generic [ref=e87]:
+                    - img [ref=e88]
+                    - generic [ref=e91]: Total Duration
+                  - generic [ref=e92]: 0 days
+                - generic [ref=e93]:
+                  - generic [ref=e94]:
+                    - img [ref=e95]
+                    - generic [ref=e97]: Est. Budget
+                  - generic [ref=e98]: $0
+                - generic [ref=e99]:
+                  - generic [ref=e100]:
+                    - img [ref=e101]
+                    - generic [ref=e104]: Countries
+                  - generic [ref=e105]: "0"
+                - generic [ref=e106]:
+                  - generic [ref=e107]:
+                    - generic [ref=e108]: 🕌
+                    - generic [ref=e109]: Avg Halal Score
+                  - generic [ref=e110]: 0%
+            - generic [ref=e111]:
+              - heading "💡 Planning Tips" [level=3] [ref=e112]
+              - list [ref=e113]:
+                - listitem [ref=e114]: • Check prayer times for each city on your trip
+                - listitem [ref=e115]: • Research halal food options before arriving
+                - listitem [ref=e116]: • Note mosque locations near your accommodations
+                - listitem [ref=e117]: • Consider Ramadan dates when planning
+                - listitem [ref=e118]: • Look for Muslim-friendly neighborhoods
+    - contentinfo [ref=e119]:
+      - generic [ref=e122]:
+        - heading "Stay Updated with HalalCities" [level=3] [ref=e123]
+        - paragraph [ref=e124]: Get the latest Muslim-friendly city guides, travel tips, and community updates delivered to your inbox.
+        - generic [ref=e125]:
+          - textbox "Enter your email" [ref=e126]
+          - button "Subscribe" [ref=e127]
+        - paragraph [ref=e128]: No spam. Unsubscribe anytime.
+      - generic [ref=e130]:
+        - generic [ref=e131]:
+          - link "🕌 HalalCities" [ref=e132] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e133]: 🕌
+            - generic [ref=e134]: HalalCities
+          - paragraph [ref=e135]: Your trusted guide to Muslim-friendly cities worldwide. Find halal food, mosques, and welcoming communities wherever you go.
+          - generic [ref=e136]:
+            - generic [ref=e137]:
+              - img [ref=e138]
+              - generic [ref=e141]: 500+ Cities
+            - generic [ref=e142]:
+              - img [ref=e143]
+              - generic [ref=e147]: 10K+ Mosques
+            - generic [ref=e148]:
+              - img [ref=e149]
+              - generic [ref=e152]: 50K+ Restaurants
+            - generic [ref=e153]:
+              - img [ref=e154]
+              - generic [ref=e159]: 100K+ Users
+          - generic [ref=e160]:
+            - link "Twitter" [ref=e161] [cursor=pointer]:
+              - /url: https://twitter.com/halalcities
+              - img [ref=e162]
+            - link "Instagram" [ref=e164] [cursor=pointer]:
+              - /url: https://instagram.com/halalcities
+              - img [ref=e165]
+            - link "YouTube" [ref=e168] [cursor=pointer]:
+              - /url: https://youtube.com/halalcities
+              - img [ref=e169]
+            - link "LinkedIn" [ref=e172] [cursor=pointer]:
+              - /url: https://linkedin.com/company/halalcities
+              - img [ref=e173]
+        - generic [ref=e177]:
+          - heading "Popular Cities" [level=4] [ref=e178]
+          - list [ref=e179]:
+            - listitem [ref=e180]:
+              - link "Istanbul" [ref=e181] [cursor=pointer]:
+                - /url: /city/istanbul
+            - listitem [ref=e182]:
+              - link "Dubai" [ref=e183] [cursor=pointer]:
+                - /url: /city/dubai
+            - listitem [ref=e184]:
+              - link "Kuala Lumpur" [ref=e185] [cursor=pointer]:
+                - /url: /city/kuala-lumpur
+            - listitem [ref=e186]:
+              - link "London" [ref=e187] [cursor=pointer]:
+                - /url: /city/london
+            - listitem [ref=e188]:
+              - link "Toronto" [ref=e189] [cursor=pointer]:
+                - /url: /city/toronto
+            - listitem [ref=e190]:
+              - link "Cairo" [ref=e191] [cursor=pointer]:
+                - /url: /city/cairo
+        - generic [ref=e192]:
+          - heading "Features" [level=4] [ref=e193]
+          - list [ref=e194]:
+            - listitem [ref=e195]:
+              - link "City Explorer" [ref=e196] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e197]:
+              - link "Mosque Finder" [ref=e198] [cursor=pointer]:
+                - /url: /mosques
+            - listitem [ref=e199]:
+              - link "Halal Restaurants" [ref=e200] [cursor=pointer]:
+                - /url: /restaurants
+            - listitem [ref=e201]:
+              - link "Prayer Times" [ref=e202] [cursor=pointer]:
+                - /url: /prayer-times
+            - listitem [ref=e203]:
+              - link "Qibla Direction" [ref=e204] [cursor=pointer]:
+                - /url: /qibla
+            - listitem [ref=e205]:
+              - link "Cost Calculator" [ref=e206] [cursor=pointer]:
+                - /url: /calculator
+        - generic [ref=e207]:
+          - heading "Resources" [level=4] [ref=e208]
+          - list [ref=e209]:
+            - listitem [ref=e210]:
+              - link "About Us" [ref=e211] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e212]:
+              - link "Blog" [ref=e213] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e214]:
+              - link "Travel Guides" [ref=e215] [cursor=pointer]:
+                - /url: /guides
+            - listitem [ref=e216]:
+              - link "API Access" [ref=e217] [cursor=pointer]:
+                - /url: /api
+            - listitem [ref=e218]:
+              - link "Contribute Data" [ref=e219] [cursor=pointer]:
+                - /url: /contribute
+            - listitem [ref=e220]:
+              - link "Contact Us" [ref=e221] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e222]:
+          - heading "Community" [level=4] [ref=e223]
+          - list [ref=e224]:
+            - listitem [ref=e225]:
+              - link "Join Community" [ref=e226] [cursor=pointer]:
+                - /url: /community
+            - listitem [ref=e227]:
+              - link "Events & Meetups" [ref=e228] [cursor=pointer]:
+                - /url: /events
+            - listitem [ref=e229]:
+              - link "Success Stories" [ref=e230] [cursor=pointer]:
+                - /url: /stories
+            - listitem [ref=e231]:
+              - link "Partner With Us" [ref=e232] [cursor=pointer]:
+                - /url: /partners
+            - listitem [ref=e233]:
+              - link "Become Ambassador" [ref=e234] [cursor=pointer]:
+                - /url: /ambassadors
+      - generic [ref=e237]:
+        - generic [ref=e238]:
+          - generic [ref=e239]: Made with
+          - img [ref=e240]
+          - generic [ref=e242]: for the Muslim Ummah
+        - paragraph [ref=e243]: © 2025 HalalCities. All rights reserved.
+        - generic [ref=e244]:
+          - link "Privacy Policy" [ref=e245] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms of Service" [ref=e246] [cursor=pointer]:
+            - /url: /terms
+          - link "Halal Verification" [ref=e247] [cursor=pointer]:
+            - /url: /halal-verification
+  - button "Open Next.js Dev Tools" [ref=e253] [cursor=pointer]:
+    - img [ref=e254]
+  - alert [ref=e257]
+```

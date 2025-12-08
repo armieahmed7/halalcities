@@ -32,7 +32,6 @@ interface ItineraryCity {
 const STORAGE_KEY = "halalcities_travel_planner"
 
 export default function TravelPlannerPage() {
-  const router = useRouter()
   const [allCities, setAllCities] = useState<City[]>([])
   const [itinerary, setItinerary] = useState<ItineraryCity[]>([])
   const [showCitySelector, setShowCitySelector] = useState(false)

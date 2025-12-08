@@ -1,0 +1,387 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "🕌 HalalCities" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e6]: 🕌
+          - generic [ref=e7]: HalalCities
+        - navigation [ref=e8]:
+          - link "Cities" [ref=e9] [cursor=pointer]:
+            - /url: /
+            - img [ref=e10]
+            - text: Cities
+          - link "Mosques" [ref=e13] [cursor=pointer]:
+            - /url: /mosques
+            - img [ref=e14]
+            - text: Mosques
+          - link "Halal Food" [ref=e18] [cursor=pointer]:
+            - /url: /restaurants
+            - img [ref=e19]
+            - text: Halal Food
+          - link "Community" [ref=e22] [cursor=pointer]:
+            - /url: /community
+            - img [ref=e23]
+            - text: Community
+          - button "Tools" [ref=e28]:
+            - text: Tools
+            - img [ref=e29]
+        - generic [ref=e31]:
+          - button "Search cities... ⌘ K" [ref=e32]:
+            - img [ref=e33]
+            - generic [ref=e36]: Search cities...
+            - generic [ref=e37]:
+              - generic [ref=e38]: ⌘
+              - text: K
+          - button [ref=e39]:
+            - img [ref=e40]
+          - generic [ref=e42]:
+            - link "Log In" [ref=e43] [cursor=pointer]:
+              - /url: /login
+              - button "Log In" [ref=e44]
+            - link "Sign Up Free" [ref=e45] [cursor=pointer]:
+              - /url: /signup
+              - button "Sign Up Free" [ref=e46]
+    - main [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - img "Dubai" [ref=e50]
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - heading "Dubai" [level=1] [ref=e56]
+                - paragraph [ref=e57]: United Arab Emirates • Middle East
+                - generic [ref=e58]:
+                  - generic [ref=e59]:
+                    - generic [ref=e60]: 🕌
+                    - generic [ref=e61]:
+                      - paragraph [ref=e62]: 1536+
+                      - paragraph [ref=e63]: Mosques
+                  - generic [ref=e64]:
+                    - generic [ref=e65]: 🍖
+                    - generic [ref=e66]:
+                      - paragraph [ref=e67]: 2637+
+                      - paragraph [ref=e68]: Halal Places
+                  - generic [ref=e69]:
+                    - generic [ref=e70]: 👥
+                    - generic [ref=e71]:
+                      - paragraph [ref=e72]: 87%
+                      - paragraph [ref=e73]: Muslim Pop.
+              - generic [ref=e76]:
+                - paragraph [ref=e77]: "94"
+                - paragraph [ref=e78]: Halal Score
+            - generic [ref=e79]:
+              - button "Join Dubai Community" [ref=e80]
+              - button "Add to Favorites" [ref=e81]
+        - generic [ref=e84]:
+          - button "Overview" [ref=e85]:
+            - img [ref=e86]
+            - text: Overview
+          - button "Prayer & Ramadan" [ref=e88]:
+            - img [ref=e89]
+            - text: Prayer & Ramadan
+          - button "Muslim Community" [ref=e91]:
+            - img [ref=e92]
+            - text: Muslim Community
+          - button "Safety & Discrimination" [ref=e97]:
+            - img [ref=e98]
+            - text: Safety & Discrimination
+          - button "Halal Places" [ref=e100]:
+            - img [ref=e101]
+            - text: Halal Places
+          - button "Mosques" [ref=e104]:
+            - img [ref=e105]
+            - text: Mosques
+          - button "Digital Nomad" [ref=e109]:
+            - img [ref=e110]
+            - text: Digital Nomad
+          - button "Cost of Living" [ref=e113]:
+            - img [ref=e114]
+            - text: Cost of Living
+          - button "Travel Info" [ref=e117]:
+            - img [ref=e118]
+            - text: Travel Info
+        - generic [ref=e121]:
+          - generic [ref=e123]:
+            - heading "City Scores" [level=3] [ref=e124]
+            - generic [ref=e125]:
+              - generic [ref=e127]:
+                - generic [ref=e128]: 🕌 Halal
+                - generic [ref=e129]: 94%
+              - generic [ref=e133]:
+                - generic [ref=e134]: 🍖 Food
+                - generic [ref=e135]: 100%
+              - generic [ref=e139]:
+                - generic [ref=e140]: 👥 Community
+                - generic [ref=e141]: 100%
+              - generic [ref=e144]:
+                - generic [ref=e145]:
+                  - generic [ref=e146]: 💰 Cost
+                  - generic [ref=e147]: 49%
+                - text: $5055/mo
+              - generic [ref=e150]:
+                - generic [ref=e151]:
+                  - generic [ref=e152]: 🌐 Internet
+                  - generic [ref=e153]: 13%
+                - text: 11 Mbps
+              - generic [ref=e157]:
+                - generic [ref=e158]: 🛡️ Safety
+                - generic [ref=e159]: 65%
+            - generic [ref=e162]:
+              - heading "Quick Features" [level=4] [ref=e163]
+              - generic [ref=e164]:
+                - generic [ref=e165]:
+                  - generic [ref=e166]: ✓
+                  - generic [ref=e167]: Airport Prayer Room
+                - generic [ref=e168]:
+                  - generic [ref=e169]: ✓
+                  - generic [ref=e170]: Islamic Banking
+                - generic [ref=e171]:
+                  - generic [ref=e172]: ✓
+                  - generic [ref=e173]: 132 Halal Hotels
+                - generic [ref=e174]:
+                  - generic [ref=e175]: ✓
+                  - generic [ref=e176]: 37 Islamic Schools
+          - generic [ref=e178]:
+            - generic [ref=e179]:
+              - heading "Welcome to Dubai" [level=2] [ref=e180]
+              - generic [ref=e181]:
+                - generic [ref=e183]:
+                  - generic [ref=e184]: 🕌
+                  - generic [ref=e185]:
+                    - paragraph [ref=e186]: 1.8M Muslims
+                    - paragraph [ref=e187]: 87% of population
+                - generic [ref=e188]:
+                  - paragraph [ref=e189]: Major Muslim Ethnicities
+                  - generic [ref=e190]:
+                    - generic [ref=e191]: Emirati
+                    - generic [ref=e192]: Indian
+                    - generic [ref=e193]: Pakistani
+                    - generic [ref=e194]: Bangladeshi
+                    - generic [ref=e195]: Egyptian
+              - generic [ref=e196]:
+                - generic [ref=e197]:
+                  - text: 🕌
+                  - paragraph [ref=e198]: 1536+
+                  - paragraph [ref=e199]: Mosques
+                - generic [ref=e200]:
+                  - text: 🍖
+                  - paragraph [ref=e201]: 2637+
+                  - paragraph [ref=e202]: Halal Places
+                - generic [ref=e203]:
+                  - text: 💰
+                  - paragraph [ref=e204]: $5055
+                  - paragraph [ref=e205]: Monthly Budget
+                - generic [ref=e206]:
+                  - text: 🌐
+                  - paragraph [ref=e207]: 11 Mbps
+                  - paragraph [ref=e208]: Internet
+            - generic [ref=e209]:
+              - heading "Safety for Muslims" [level=3] [ref=e210]:
+                - img [ref=e211]
+                - text: Safety for Muslims
+              - generic [ref=e213]:
+                - generic [ref=e214]:
+                  - paragraph [ref=e215]: 1/10
+                  - paragraph [ref=e216]: Hijab
+                - generic [ref=e217]:
+                  - paragraph [ref=e218]: 1/10
+                  - paragraph [ref=e219]: Niqab
+                - generic [ref=e220]:
+                  - paragraph [ref=e221]: 1/10
+                  - paragraph [ref=e222]: Racism
+                - generic [ref=e223]:
+                  - paragraph [ref=e224]: 1/10
+                  - paragraph [ref=e225]: Islamophobia
+              - paragraph [ref=e226]: Lower scores = less discrimination (1-10 scale)
+            - generic [ref=e227]:
+              - heading "Airport Information" [level=3] [ref=e228]:
+                - img [ref=e229]
+                - text: Airport Information
+              - generic [ref=e232]:
+                - generic [ref=e233]: 🕌
+                - generic [ref=e234]:
+                  - paragraph [ref=e235]: Prayer Room Available
+                  - paragraph [ref=e236]: Prayer facilities available at major airport
+            - generic [ref=e237]:
+              - heading "Halal Food Scene" [level=3] [ref=e238]:
+                - img [ref=e239]
+                - text: Halal Food Scene
+              - generic [ref=e242]:
+                - generic [ref=e243]:
+                  - paragraph [ref=e244]: 2637+
+                  - paragraph [ref=e245]: Halal Restaurants
+                - generic [ref=e246]:
+                  - paragraph [ref=e247]: 264+
+                  - paragraph [ref=e248]: Halal Meat Shops
+              - button "View All Halal Places" [ref=e249]
+          - generic [ref=e252]:
+            - generic [ref=e253]:
+              - heading "Map of Dubai" [level=3] [ref=e254]
+              - generic [ref=e255]:
+                - button "All" [ref=e256]:
+                  - img [ref=e257]
+                  - text: All
+                - button "Mosques (1)" [ref=e260]:
+                  - img [ref=e261]
+                  - text: Mosques (1)
+                - button "Restaurants (0)" [ref=e265]:
+                  - img [ref=e266]
+                  - text: Restaurants (0)
+            - iframe [ref=e273]:
+              - generic [ref=f1e3]:
+                - region "Map" [ref=f1e4]
+                - iframe [ref=f1e22]:
+                  
+            - generic [ref=e274]:
+              - generic [ref=e275]: Showing 1 locations
+              - generic [ref=e278] [cursor=pointer]:
+                - img [ref=e280]
+                - generic [ref=e284]:
+                  - heading "Jumeirah Grand Mosque" [level=4] [ref=e285]
+                  - paragraph [ref=e286]: Jumeirah Beach Road
+                - link "Directions" [ref=e287]:
+                  - /url: https://www.google.com/maps/search/?api=1&query=Jumeirah%20Grand%20Mosque%20Jumeirah%20Beach%20Road
+        - heading "1843 members in Dubai community" [level=3] [ref=e290]
+    - contentinfo [ref=e322]:
+      - generic [ref=e325]:
+        - heading "Stay Updated with HalalCities" [level=3] [ref=e326]
+        - paragraph [ref=e327]: Get the latest Muslim-friendly city guides, travel tips, and community updates delivered to your inbox.
+        - generic [ref=e328]:
+          - textbox "Enter your email" [ref=e329]
+          - button "Subscribe" [ref=e330]
+        - paragraph [ref=e331]: No spam. Unsubscribe anytime.
+      - generic [ref=e333]:
+        - generic [ref=e334]:
+          - link "🕌 HalalCities" [ref=e335] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e336]: 🕌
+            - generic [ref=e337]: HalalCities
+          - paragraph [ref=e338]: Your trusted guide to Muslim-friendly cities worldwide. Find halal food, mosques, and welcoming communities wherever you go.
+          - generic [ref=e339]:
+            - generic [ref=e340]:
+              - img [ref=e341]
+              - generic [ref=e344]: 500+ Cities
+            - generic [ref=e345]:
+              - img [ref=e346]
+              - generic [ref=e350]: 10K+ Mosques
+            - generic [ref=e351]:
+              - img [ref=e352]
+              - generic [ref=e355]: 50K+ Restaurants
+            - generic [ref=e356]:
+              - img [ref=e357]
+              - generic [ref=e362]: 100K+ Users
+          - generic [ref=e363]:
+            - link "Twitter" [ref=e364] [cursor=pointer]:
+              - /url: https://twitter.com/halalcities
+              - img [ref=e365]
+            - link "Instagram" [ref=e367] [cursor=pointer]:
+              - /url: https://instagram.com/halalcities
+              - img [ref=e368]
+            - link "YouTube" [ref=e371] [cursor=pointer]:
+              - /url: https://youtube.com/halalcities
+              - img [ref=e372]
+            - link "LinkedIn" [ref=e375] [cursor=pointer]:
+              - /url: https://linkedin.com/company/halalcities
+              - img [ref=e376]
+        - generic [ref=e380]:
+          - heading "Popular Cities" [level=4] [ref=e381]
+          - list [ref=e382]:
+            - listitem [ref=e383]:
+              - link "Istanbul" [ref=e384] [cursor=pointer]:
+                - /url: /city/istanbul
+            - listitem [ref=e385]:
+              - link "Dubai" [ref=e386] [cursor=pointer]:
+                - /url: /city/dubai
+            - listitem [ref=e387]:
+              - link "Kuala Lumpur" [ref=e388] [cursor=pointer]:
+                - /url: /city/kuala-lumpur
+            - listitem [ref=e389]:
+              - link "London" [ref=e390] [cursor=pointer]:
+                - /url: /city/london
+            - listitem [ref=e391]:
+              - link "Toronto" [ref=e392] [cursor=pointer]:
+                - /url: /city/toronto
+            - listitem [ref=e393]:
+              - link "Cairo" [ref=e394] [cursor=pointer]:
+                - /url: /city/cairo
+        - generic [ref=e395]:
+          - heading "Features" [level=4] [ref=e396]
+          - list [ref=e397]:
+            - listitem [ref=e398]:
+              - link "City Explorer" [ref=e399] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e400]:
+              - link "Mosque Finder" [ref=e401] [cursor=pointer]:
+                - /url: /mosques
+            - listitem [ref=e402]:
+              - link "Halal Restaurants" [ref=e403] [cursor=pointer]:
+                - /url: /restaurants
+            - listitem [ref=e404]:
+              - link "Prayer Times" [ref=e405] [cursor=pointer]:
+                - /url: /prayer-times
+            - listitem [ref=e406]:
+              - link "Qibla Direction" [ref=e407] [cursor=pointer]:
+                - /url: /qibla
+            - listitem [ref=e408]:
+              - link "Cost Calculator" [ref=e409] [cursor=pointer]:
+                - /url: /calculator
+        - generic [ref=e410]:
+          - heading "Resources" [level=4] [ref=e411]
+          - list [ref=e412]:
+            - listitem [ref=e413]:
+              - link "About Us" [ref=e414] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e415]:
+              - link "Blog" [ref=e416] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e417]:
+              - link "Travel Guides" [ref=e418] [cursor=pointer]:
+                - /url: /guides
+            - listitem [ref=e419]:
+              - link "API Access" [ref=e420] [cursor=pointer]:
+                - /url: /api
+            - listitem [ref=e421]:
+              - link "Contribute Data" [ref=e422] [cursor=pointer]:
+                - /url: /contribute
+            - listitem [ref=e423]:
+              - link "Contact Us" [ref=e424] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e425]:
+          - heading "Community" [level=4] [ref=e426]
+          - list [ref=e427]:
+            - listitem [ref=e428]:
+              - link "Join Community" [ref=e429] [cursor=pointer]:
+                - /url: /community
+            - listitem [ref=e430]:
+              - link "Events & Meetups" [ref=e431] [cursor=pointer]:
+                - /url: /events
+            - listitem [ref=e432]:
+              - link "Success Stories" [ref=e433] [cursor=pointer]:
+                - /url: /stories
+            - listitem [ref=e434]:
+              - link "Partner With Us" [ref=e435] [cursor=pointer]:
+                - /url: /partners
+            - listitem [ref=e436]:
+              - link "Become Ambassador" [ref=e437] [cursor=pointer]:
+                - /url: /ambassadors
+      - generic [ref=e440]:
+        - generic [ref=e441]:
+          - generic [ref=e442]: Made with
+          - img [ref=e443]
+          - generic [ref=e445]: for the Muslim Ummah
+        - paragraph [ref=e446]: © 2025 HalalCities. All rights reserved.
+        - generic [ref=e447]:
+          - link "Privacy Policy" [ref=e448] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms of Service" [ref=e449] [cursor=pointer]:
+            - /url: /terms
+          - link "Halal Verification" [ref=e450] [cursor=pointer]:
+            - /url: /halal-verification
+  - button "Open Next.js Dev Tools" [ref=e456] [cursor=pointer]:
+    - img [ref=e457]
+  - alert [ref=e460]
+```

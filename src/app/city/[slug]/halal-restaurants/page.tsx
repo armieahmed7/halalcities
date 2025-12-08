@@ -6,6 +6,8 @@ import { cities } from "@/data/cities"
 import { restaurantsByCity } from "@/data/restaurants"
 import { RestaurantCard } from "@/components/city/restaurant-card"
 import { HalalRestaurantsMap } from "@/components/city/halal-restaurants-map"
+import { SubPageNavSidebar, SubPageNavCompact } from "@/components/city/sub-page-nav"
+import { Breadcrumb, BreadcrumbSchema } from "@/components/ui/breadcrumb"
 import {
   Utensils,
   MapPin,
@@ -620,6 +622,13 @@ export default async function HalalRestaurantsPage({ params }: PageProps) {
                   >
                     <Users className="w-5 h-5 text-orange-600" />
                     <span className="text-[var(--foreground)]">Muslim Community</span>
+                  </Link>
+                  <Link
+                    href={`/city/${city.slug}/halal-hotels`}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-secondary)] transition-colors"
+                  >
+                    <Building2 className="w-5 h-5 text-amber-600" />
+                    <span className="text-[var(--foreground)]">Halal Hotels ({city.features.halalHotels}+)</span>
                   </Link>
                 </nav>
               </div>

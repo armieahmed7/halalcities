@@ -18,6 +18,8 @@ import { PrayerTimesWidget } from "@/components/city/prayer-times-widget"
 import { QiblaCompass } from "@/components/city/qibla-compass"
 import { RamadanGuide } from "@/components/city/ramadan-guide"
 import { HalalRestaurantsMap } from "@/components/city/halal-restaurants-map"
+import { SubPageNav } from "@/components/city/sub-page-nav"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { Filter, MapPin, Users, Shield, Plane, Building2, Utensils, Info, Moon } from "lucide-react"
 
 export default function CityPage() {
@@ -59,9 +61,9 @@ export default function CityPage() {
   const ext = city.extended
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
       {/* Hero Section */}
-      <div className="relative h-96 w-full">
+      <div className="relative h-64 sm:h-80 md:h-96 w-full">
         <Image
           src={city.primaryImage}
           alt={city.name}
@@ -72,55 +74,55 @@ export default function CityPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
         {/* City Info Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className="container mx-auto">
-            <div className="flex items-end justify-between">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
-                <h1 className="text-5xl font-bold text-white mb-2">{city.name}</h1>
-                <p className="text-xl text-white/90">{city.country} {city.region && `• ${city.region}`}</p>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1 sm:mb-2">{city.name}</h1>
+                <p className="text-base sm:text-lg md:text-xl text-white/90">{city.country} {city.region && `• ${city.region}`}</p>
 
                 {/* Quick Stats */}
-                <div className="flex gap-6 mt-4 text-white/80">
+                <div className="flex flex-wrap gap-3 sm:gap-6 mt-3 sm:mt-4 text-white/80">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">🕌</span>
+                    <span className="text-lg sm:text-2xl">🕌</span>
                     <div>
-                      <p className="text-xl font-bold text-white">{city.stats.mosques}+</p>
-                      <p className="text-xs">Mosques</p>
+                      <p className="text-base sm:text-xl font-bold text-white">{city.stats.mosques}+</p>
+                      <p className="text-[10px] sm:text-xs">Mosques</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">🍖</span>
+                    <span className="text-lg sm:text-2xl">🍖</span>
                     <div>
-                      <p className="text-xl font-bold text-white">{city.stats.halalRestaurants}+</p>
-                      <p className="text-xs">Halal Places</p>
+                      <p className="text-base sm:text-xl font-bold text-white">{city.stats.halalRestaurants}+</p>
+                      <p className="text-[10px] sm:text-xs">Halal Places</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">👥</span>
+                    <span className="text-lg sm:text-2xl">👥</span>
                     <div>
-                      <p className="text-xl font-bold text-white">{city.scores.muslimPopulationPercent}%</p>
-                      <p className="text-xs">Muslim Pop.</p>
+                      <p className="text-base sm:text-xl font-bold text-white">{city.scores.muslimPopulationPercent}%</p>
+                      <p className="text-[10px] sm:text-xs">Muslim Pop.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Halal Score Badge */}
-              <div className="text-center">
-                <div className={`w-24 h-24 rounded-full ${getScoreColor(city.scores.halal)} flex items-center justify-center`}>
+              <div className="text-center hidden sm:block">
+                <div className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full ${getScoreColor(city.scores.halal)} flex items-center justify-center`}>
                   <div className="text-white">
-                    <p className="text-3xl font-bold">{city.scores.halal}</p>
-                    <p className="text-xs">Halal Score</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold">{city.scores.halal}</p>
+                    <p className="text-[10px] sm:text-xs">Halal Score</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-4 mt-6">
-              <Button className="bg-green-600 hover:bg-green-700 text-white">
-                Join {city.name} Community
+            <div className="flex flex-wrap gap-2 sm:gap-4 mt-4 sm:mt-6">
+              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base px-3 sm:px-4">
+                Join Community
               </Button>
-              <Button variant="secondary" className="bg-white/20 backdrop-blur text-white hover:bg-white/30">
+              <Button variant="secondary" className="bg-white/20 backdrop-blur text-white hover:bg-white/30 text-sm sm:text-base px-3 sm:px-4">
                 Add to Favorites
               </Button>
             </div>
@@ -129,9 +131,9 @@ export default function CityPage() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b bg-white sticky top-16 z-40">
-        <div className="container mx-auto">
-          <div className="flex overflow-x-auto scrollbar-hide">
+      <div className="border-b bg-white dark:bg-gray-800 sticky top-16 z-40 overflow-x-hidden">
+        <div className="container mx-auto px-4">
+          <div className="flex overflow-x-auto scrollbar-hide -mx-4 px-4">
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -150,8 +152,29 @@ export default function CityPage() {
         </div>
       </div>
 
+      {/* Breadcrumb & Sub-Page Navigation */}
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumb
+          items={[
+            { label: city.country, href: `/?country=${encodeURIComponent(city.country)}` },
+            { label: city.name }
+          ]}
+          className="mb-4"
+        />
+        <SubPageNav
+          citySlug={city.slug}
+          cityName={city.name}
+          stats={{
+            mosques: city.stats.mosques,
+            halalRestaurants: city.stats.halalRestaurants,
+            islamicSchools: city.features.islamicSchools,
+            halalHotels: city.features.halalHotels
+          }}
+        />
+      </div>
+
       {/* Main Content */}
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Sidebar - Scores */}
           <div className="lg:col-span-3">

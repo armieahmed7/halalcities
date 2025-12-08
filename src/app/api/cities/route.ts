@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const search = searchParams.get("search")?.toLowerCase()
     const minHalal = searchParams.get("minHalal")
     const maxBudget = searchParams.get("maxBudget")
-    const limit = parseInt(searchParams.get("limit") || "200") // Default to 200 to get all cities
+    const limit = parseInt(searchParams.get("limit") || "1500") // Default to 1500 to get all cities
     const offset = parseInt(searchParams.get("offset") || "0")
 
     // Start with all cities

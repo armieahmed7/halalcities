@@ -111,8 +111,8 @@ export function CityCard({ city, onFavorite, isFavorited: propIsFavorited }: Cit
           <div className="absolute bottom-3 left-3 right-3">
             <div className="flex items-end justify-between">
               <div>
-                <h3 className="text-xl font-bold text-emerald-100 mb-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{city.name}</h3>
-                <div className="flex items-center gap-1.5 text-teal-100 text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <h3 className="text-xl font-bold text-white mb-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{city.name}</h3>
+                <div className="flex items-center gap-1.5 text-white/90 text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                   <MapPin className="w-3.5 h-3.5" />
                   <span>{city.country}</span>
                 </div>

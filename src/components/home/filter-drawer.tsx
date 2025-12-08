@@ -45,7 +45,7 @@ const defaultFilters: FilterState = {
   airportPrayerRoom: null,
   islamicBanks: null,
   halalHotels: null,
-  budget: [0, 5000],
+  budget: [0, 15000],
   safety: [],
   internet: [],
   weather: [],
@@ -229,7 +229,7 @@ export function FilterDrawer({
                 <input
                   type="range"
                   min="0"
-                  max="5000"
+                  max="15000"
                   step="100"
                   value={filters.budget[0]}
                   onChange={(e) => updateFilter('budget', [parseInt(e.target.value), filters.budget[1]])}
@@ -238,7 +238,7 @@ export function FilterDrawer({
                 <input
                   type="range"
                   min="0"
-                  max="5000"
+                  max="15000"
                   step="100"
                   value={filters.budget[1]}
                   onChange={(e) => updateFilter('budget', [filters.budget[0], parseInt(e.target.value)])}

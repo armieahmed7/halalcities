@@ -21,7 +21,8 @@ import {
   Sun,
   Compass,
   Clock,
-  Calculator
+  GitCompare,
+  Plane
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -116,6 +117,25 @@ export function Header({ user }: HeaderProps) {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link href="/planner" className="flex items-center">
+                  <Plane className="w-4 h-4 mr-2" />
+                  Trip Planner
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/compare" className="flex items-center">
+                  <GitCompare className="w-4 h-4 mr-2" />
+                  Compare Cities
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/favorites" className="flex items-center">
+                  <Heart className="w-4 h-4 mr-2" />
+                  Saved Cities
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Compass className="w-4 h-4 mr-2" />
                 Qibla Finder
@@ -123,10 +143,6 @@ export function Header({ user }: HeaderProps) {
               <DropdownMenuItem>
                 <Clock className="w-4 h-4 mr-2" />
                 Prayer Times
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Calculator className="w-4 h-4 mr-2" />
-                Cost Calculator
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

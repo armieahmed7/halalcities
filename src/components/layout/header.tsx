@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Search,
   Menu,
@@ -22,7 +22,8 @@ import {
   Compass,
   Clock,
   GitCompare,
-  Plane
+  Plane,
+  Loader2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -32,17 +33,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/context/auth-context"
 
-interface HeaderProps {
-  user?: {
-    id: string
-    email: string
-    name?: string
-    avatar?: string
-  } | null
-}
-
-export function Header({ user }: HeaderProps) {
+export function Header() {
+  const router = useRouter()
+  const { user, profile, isLoading, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [isDark, setIsDark] = useState(false)
@@ -171,29 +166,33 @@ export function Header({ user }: HeaderProps) {
           </button>
 
           {/* Auth Buttons or User Menu */}
-          {user ? (
+          {isLoading ? (
+            <div className="w-8 h-8 flex items-center justify-center">
+              <Loader2 className="w-5 h-5 animate-spin text-[var(--foreground-muted)]" />
+            </div>
+          ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 p-1 rounded-full hover:bg-[var(--background-secondary)] transition-colors">
-                  {user.avatar ? (
+                  {profile?.avatar_url ? (
                     <div className="relative w-8 h-8">
                       <Image
-                        src={user.avatar}
-                        alt={user.name || "User"}
+                        src={profile.avatar_url}
+                        alt={profile.name || "User"}
                         fill
                         className="rounded-full object-cover"
                       />
                     </div>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-medium">
-                      {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                      {(profile?.name || user.email)?.charAt(0).toUpperCase()}
                     </div>
                   )}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium">{user.name || "User"}</p>
+                  <p className="text-sm font-medium">{profile?.name || "User"}</p>
                   <p className="text-xs text-[var(--foreground-muted)]">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
@@ -210,13 +209,19 @@ export function Header({ user }: HeaderProps) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/settings">
+                  <Link href="/profile">
                     <Settings className="w-4 h-4 mr-2" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">
+                <DropdownMenuItem
+                  className="text-red-600 cursor-pointer"
+                  onClick={async () => {
+                    await signOut()
+                    router.push('/')
+                  }}
+                >
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </DropdownMenuItem>

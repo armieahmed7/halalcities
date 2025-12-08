@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { MapPin, Building2, Utensils, ChevronDown } from "lucide-react"
+import { MapPin, Building2, Utensils, ChevronDown, Mail, ArrowRight, Check, Loader2 } from "lucide-react"
 import { SearchAutocomplete } from "@/components/search/search-autocomplete"
 
 interface HeroSectionProps {
@@ -20,6 +20,10 @@ export function HeroSection({
   const [animatedCities, setAnimatedCities] = useState(0)
   const [animatedMosques, setAnimatedMosques] = useState(0)
   const [animatedRestaurants, setAnimatedRestaurants] = useState(0)
+  const [email, setEmail] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [error, setError] = useState("")
 
   // Animate numbers on mount
   useEffect(() => {
@@ -48,6 +52,37 @@ export function HeroSection({
       top: window.innerHeight - 100,
       behavior: 'smooth'
     })
+  }
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || !email.includes('@')) {
+      setError("Please enter a valid email address")
+      return
+    }
+
+    setIsSubmitting(true)
+    setError("")
+
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+
+      if (response.ok) {
+        setIsSubscribed(true)
+        setEmail("")
+      } else {
+        const data = await response.json()
+        setError(data.error || "Failed to subscribe. Please try again.")
+      }
+    } catch {
+      setError("Something went wrong. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -135,6 +170,64 @@ export function HeroSection({
               <span className="text-3xl sm:text-4xl font-bold">{animatedRestaurants.toLocaleString()}+</span>
             </div>
             <p className="text-sm text-[var(--foreground-secondary)] mt-1">Halal Restaurants</p>
+          </div>
+        </div>
+
+        {/* Email Capture Section */}
+        <div className="mt-16 mb-8 animate-fade-in">
+          <div className="max-w-xl mx-auto">
+            {isSubscribed ? (
+              <div className="flex items-center justify-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                  <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="text-left">
+                  <p className="font-semibold text-emerald-900 dark:text-emerald-100">You&apos;re all set!</p>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-300">Check your inbox for a welcome email.</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-lg text-[var(--foreground-secondary)] mb-4">
+                  Get weekly updates on the best Muslim-friendly cities, travel tips, and exclusive deals.
+                </p>
+                <form onSubmit={handleEmailSubmit} className="relative">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground-muted)]" />
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email address"
+                        className="w-full pl-12 pr-4 py-4 text-base bg-[var(--background)] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all text-[var(--foreground)] placeholder:text-[var(--foreground-muted)]"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-8 py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 min-w-[160px]"
+                    >
+                      {isSubmitting ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <>
+                          Subscribe
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {error && (
+                    <p className="text-red-500 text-sm mt-2">{error}</p>
+                  )}
+                </form>
+                <p className="text-xs text-[var(--foreground-muted)] mt-3">
+                  Join 50,000+ Muslim travelers. Unsubscribe anytime.
+                </p>
+              </>
+            )}
           </div>
         </div>
 

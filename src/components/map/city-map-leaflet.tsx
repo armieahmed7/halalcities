@@ -37,10 +37,19 @@ export function CityMapLeaflet({ cities, onCityClick }: CityMapProps) {
   // Create custom icons based on halal score
   const getMarkerIcon = (halalScore: number) => {
     const color = halalScore >= 90 ? '#10b981' : halalScore >= 70 ? '#f59e0b' : '#6b7280'
-    
-    const svgString = `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><circle cx="15" cy="15" r="15" fill="${color}"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="white" font-size="16" font-weight="bold">🕌</text></svg>`;
-    const svgBase64 = typeof window !== 'undefined' ? btoa(svgString) : '';
-    
+
+    // Use simple SVG without emoji to avoid btoa() Unicode issues
+    // Design: Colored circle with mosque dome silhouette
+    const svgString = `<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="15" cy="15" r="14" fill="${color}" stroke="white" stroke-width="2"/>
+      <path d="M15 6 L15 8 M15 8 C12 8 10 11 10 14 L10 20 L20 20 L20 14 C20 11 18 8 15 8 M12 20 L12 16 L14 16 L14 20 M16 20 L16 16 L18 16 L18 20" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+    // UTF-8 safe base64 encoding (handles any Unicode characters)
+    const svgBase64 = typeof window !== 'undefined'
+      ? btoa(unescape(encodeURIComponent(svgString)))
+      : '';
+
     return new Icon({
       iconUrl: `data:image/svg+xml;base64,${svgBase64}`,
       iconSize: [30, 30],
@@ -64,7 +73,7 @@ export function CityMapLeaflet({ cities, onCityClick }: CityMapProps) {
         
         {cities.map((city) => (
           <Marker
-            key={city.id}
+            key={`${city.slug}-${city.coordinates.lat}-${city.coordinates.lng}`}
             position={[city.coordinates.lat, city.coordinates.lng]}
             icon={getMarkerIcon(city.scores.halal)}
             eventHandlers={{

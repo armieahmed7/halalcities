@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { FavoritesProvider } from "@/context/favorites-context";
+import { AuthProvider } from "@/context/auth-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,15 +43,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased bg-[var(--background)] text-[var(--foreground)]`}>
-        <FavoritesProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </FavoritesProvider>
+        <AuthProvider>
+          <FavoritesProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </FavoritesProvider>
+        </AuthProvider>
       </body>
     </html>
   );

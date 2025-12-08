@@ -1,0 +1,54 @@
+[
+  {
+    "page": "API",
+    "issue": "Expected 100 cities, got 20"
+  },
+  {
+    "page": "Homepage",
+    "issue": "Broken image: https://images.unsplash.com/photo-1548834925-e48f8a27ae24?w=800"
+  },
+  {
+    "page": "City: new-york",
+    "issue": "404 - City page not found"
+  },
+  {
+    "page": "City: london",
+    "issue": "404 - City page not found"
+  },
+  {
+    "page": "City: dubai",
+    "issue": "404 - City page not found"
+  },
+  {
+    "page": "City: tokyo",
+    "issue": "404 - City page not found"
+  },
+  {
+    "page": "City: istanbul",
+    "issue": "404 - City page not found"
+  },
+  {
+    "page": "City: paris",
+    "issue": "404 - City page not found"
+  },
+  {
+    "page": "City: singapore",
+    "issue": "404 - City page not found"
+  },
+  {
+    "page": "City: kuala-lumpur",
+    "issue": "404 - City page not found"
+  },
+  {
+    "page": "Console Errors",
+    "issue": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "page": "Console Errors",
+    "issue": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "page": "Console Errors",
+    "issue": "Failed to load resource: the server responded with a status of 404 ()"
+  }
+]

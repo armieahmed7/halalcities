@@ -14,7 +14,10 @@ import { CostOfLiving } from "@/components/city/cost-of-living"
 import { DigitalNomadGuide } from "@/components/city/digital-nomad-guide"
 import { ExtendedInfo } from "@/components/city/extended-info"
 import { LocationMap } from "@/components/city/location-map"
-import { Filter, MapPin, Users, Shield, Plane, Building2, Utensils, Info } from "lucide-react"
+import { PrayerTimesWidget } from "@/components/city/prayer-times-widget"
+import { QiblaCompass } from "@/components/city/qibla-compass"
+import { RamadanGuide } from "@/components/city/ramadan-guide"
+import { Filter, MapPin, Users, Shield, Plane, Building2, Utensils, Info, Moon } from "lucide-react"
 
 export default function CityPage() {
   const params = useParams()
@@ -28,6 +31,7 @@ export default function CityPage() {
 
   const tabs = [
     { id: "overview", label: "Overview", icon: Info },
+    { id: "prayer", label: "Prayer & Ramadan", icon: Moon },
     { id: "community", label: "Muslim Community", icon: Users },
     { id: "safety", label: "Safety & Discrimination", icon: Shield },
     { id: "halal", label: "Halal Places", icon: Utensils },
@@ -364,6 +368,40 @@ export default function CityPage() {
                     </div>
                   </>
                 )}
+              </div>
+            )}
+
+            {activeTab === "prayer" && (
+              <div className="space-y-6">
+                {/* Prayer Times */}
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <PrayerTimesWidget
+                    latitude={city.coordinates.lat}
+                    longitude={city.coordinates.lng}
+                    cityName={city.name}
+                    variant="full"
+                  />
+                </div>
+
+                {/* Qibla Direction */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🧭</span>
+                    Qibla Direction
+                  </h3>
+                  <QiblaCompass
+                    latitude={city.coordinates.lat}
+                    longitude={city.coordinates.lng}
+                  />
+                </div>
+
+                {/* Ramadan Guide */}
+                <RamadanGuide
+                  latitude={city.coordinates.lat}
+                  longitude={city.coordinates.lng}
+                  cityName={city.name}
+                  country={city.country}
+                />
               </div>
             )}
 

@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
 import { City } from "@/types/city"
+import { useFavorites } from "@/context/favorites-context"
 import {
   Heart,
   MapPin,
@@ -23,7 +24,9 @@ interface CityCardProps {
   isFavorited?: boolean
 }
 
-export function CityCard({ city, onFavorite, isFavorited = false }: CityCardProps) {
+export function CityCard({ city, onFavorite, isFavorited: propIsFavorited }: CityCardProps) {
+  const { isFavorite, toggleFavorite } = useFavorites()
+  const isFavorited = propIsFavorited ?? isFavorite(city.slug)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -41,6 +44,7 @@ export function CityCard({ city, onFavorite, isFavorited = false }: CityCardProp
   const handleFavorite = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    toggleFavorite(city.slug)
     onFavorite?.(city.slug)
   }
 

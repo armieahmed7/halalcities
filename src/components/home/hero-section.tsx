@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, MapPin, Building2, Utensils, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { MapPin, Building2, Utensils, ChevronDown } from "lucide-react"
+import { SearchAutocomplete } from "@/components/search/search-autocomplete"
 
 interface HeroSectionProps {
   onSearch?: (query: string) => void
@@ -17,7 +17,6 @@ export function HeroSection({
   totalMosques = 10000,
   totalRestaurants = 50000
 }: HeroSectionProps) {
-  const [searchQuery, setSearchQuery] = useState("")
   const [animatedCities, setAnimatedCities] = useState(0)
   const [animatedMosques, setAnimatedMosques] = useState(0)
   const [animatedRestaurants, setAnimatedRestaurants] = useState(0)
@@ -43,11 +42,6 @@ export function HeroSection({
 
     return () => clearInterval(timer)
   }, [totalCities, totalMosques, totalRestaurants])
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSearch?.(searchQuery)
-  }
 
   const scrollToContent = () => {
     window.scrollTo({
@@ -95,27 +89,14 @@ export function HeroSection({
           Your ultimate guide to traveling and living as a Muslim worldwide.
         </p>
 
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 animate-slide-up">
-          <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-[var(--foreground-muted)]">
-              <Search className="w-5 h-5" />
-            </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search cities, countries, or features..."
-              className="w-full pl-12 pr-32 py-4 text-lg bg-[var(--background)] border border-[var(--border)] rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all text-[var(--foreground)] placeholder:text-[var(--foreground-muted)]"
-            />
-            <Button
-              type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white rounded-xl"
-            >
-              Explore
-            </Button>
-          </div>
-        </form>
+        {/* Search Bar with Autocomplete */}
+        <div className="max-w-2xl mx-auto mb-12 animate-slide-up">
+          <SearchAutocomplete
+            onSearch={onSearch}
+            placeholder="Search cities, countries, or features..."
+            showTrending={true}
+          />
+        </div>
 
         {/* Quick Filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-12 animate-fade-in">

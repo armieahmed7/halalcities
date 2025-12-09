@@ -101,6 +101,19 @@ export default async function MuslimCommunityPage({ params }: PageProps) {
     return "High"
   }
 
+  // Helper function for acceptance score color (higher is better)
+  const getAcceptanceColor = (score: number) => {
+    if (score >= 8) return "text-green-600 bg-green-50 dark:bg-green-900/20"
+    if (score >= 5) return "text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20"
+    return "text-red-600 bg-red-50 dark:bg-red-900/20"
+  }
+
+  const getAcceptanceLabel = (score: number) => {
+    if (score >= 8) return "High"
+    if (score >= 5) return "Moderate"
+    return "Low"
+  }
+
   // JSON-LD Schema
   const jsonLd = {
     "@context": "https://schema.org",
@@ -410,8 +423,71 @@ export default async function MuslimCommunityPage({ params }: PageProps) {
                 </section>
               ) : null}
 
-              {/* Safety & Discrimination */}
-              {ext?.discrimination && (
+              {/* Safety & Acceptance - Using Research Data when available */}
+              {research?.safetyInfo ? (
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-purple-500" />
+                    Safety & Acceptance in {city.name}
+                  </h2>
+                  <p className="text-sm text-[var(--foreground-muted)] mb-4">
+                    Acceptance levels (1-10 scale, higher is better)
+                  </p>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className={`rounded-xl p-4 text-center ${getAcceptanceColor(research.safetyInfo.hijabAcceptance)}`}>
+                      <p className="text-2xl font-bold">{research.safetyInfo.hijabAcceptance}/10</p>
+                      <p className="text-sm font-medium">Hijab</p>
+                      <p className="text-xs opacity-75">{getAcceptanceLabel(research.safetyInfo.hijabAcceptance)}</p>
+                    </div>
+                    <div className={`rounded-xl p-4 text-center ${getAcceptanceColor(research.safetyInfo.niqabAcceptance)}`}>
+                      <p className="text-2xl font-bold">{research.safetyInfo.niqabAcceptance}/10</p>
+                      <p className="text-sm font-medium">Niqab</p>
+                      <p className="text-xs opacity-75">{getAcceptanceLabel(research.safetyInfo.niqabAcceptance)}</p>
+                    </div>
+                    <div className={`rounded-xl p-4 text-center ${getAcceptanceColor(research.safetyInfo.beardAcceptance)}`}>
+                      <p className="text-2xl font-bold">{research.safetyInfo.beardAcceptance}/10</p>
+                      <p className="text-sm font-medium">Beard</p>
+                      <p className="text-xs opacity-75">{getAcceptanceLabel(research.safetyInfo.beardAcceptance)}</p>
+                    </div>
+                    <div className={`rounded-xl p-4 text-center ${getAcceptanceColor(research.safetyInfo.overallSafety)}`}>
+                      <p className="text-2xl font-bold">{research.safetyInfo.overallSafety}/10</p>
+                      <p className="text-sm font-medium">Overall Safety</p>
+                      <p className="text-xs opacity-75">{getAcceptanceLabel(research.safetyInfo.overallSafety)}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-3 bg-[var(--background-secondary)] rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-sm font-medium">Islamophobia Level:</span>
+                      <span className={`text-sm px-2 py-0.5 rounded ${
+                        research.safetyInfo.islamophobiaLevel === 'low' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                        research.safetyInfo.islamophobiaLevel === 'moderate' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                      }`}>
+                        {research.safetyInfo.islamophobiaLevel.charAt(0).toUpperCase() + research.safetyInfo.islamophobiaLevel.slice(1)}
+                      </span>
+                    </div>
+                    {research.safetyInfo.legalProtections.length > 0 && (
+                      <p className="text-xs text-[var(--foreground-muted)]">
+                        Legal protections: {research.safetyInfo.legalProtections.join(', ')}
+                      </p>
+                    )}
+                  </div>
+
+                  {research.safetyInfo.niqabAcceptance <= 3 && (
+                    <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-yellow-700 dark:text-yellow-400">Niqab Advisory</p>
+                        <p className="text-sm text-yellow-600 dark:text-yellow-300">
+                          Wearing niqab may face significant challenges or legal restrictions in {city.name}.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </section>
+              ) : ext?.discrimination ? (
                 <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
                   <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
                     <Shield className="w-5 h-5 text-purple-500" />
@@ -458,24 +534,7 @@ export default async function MuslimCommunityPage({ params }: PageProps) {
                     </div>
                   )}
                 </section>
-              )}
-
-              {/* Quality of Life for Muslims */}
-              {ext?.qualityOfLife && (
-                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
-                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">
-                    Quality of Life for Muslims
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    <QualityItem label="Safety" score={ext.qualityOfLife.safety} />
-                    <QualityItem label="Female Friendly" score={ext.qualityOfLife.femaleFriendly} />
-                    <QualityItem label="Racial Tolerance" score={ext.qualityOfLife.racialTolerance} />
-                    <QualityItem label="Foreigner Friendly" score={ext.qualityOfLife.friendlyToForeigners} />
-                    <QualityItem label="Freedom of Speech" score={ext.qualityOfLife.freedomOfSpeech} />
-                    <QualityItem label="English Speaking" score={ext.qualityOfLife.englishSpeaking} />
-                  </div>
-                </section>
-              )}
+              ) : null}
 
               {/* Local Organizations */}
               {ext?.religiousInfrastructure.localOrganizations && ext.religiousInfrastructure.localOrganizations.length > 0 && (

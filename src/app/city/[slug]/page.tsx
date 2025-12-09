@@ -20,6 +20,7 @@ import { RamadanGuide } from "@/components/city/ramadan-guide"
 import { HalalRestaurantsMapModern } from "@/components/city/halal-restaurants-map-modern"
 import { SubPageNav } from "@/components/city/sub-page-nav"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
+import { BookingCTA } from "@/components/affiliate/booking-cta"
 import { Filter, MapPin, Users, Shield, Plane, Building2, Utensils, Info, Moon } from "lucide-react"
 
 export default function CityPage() {
@@ -299,6 +300,13 @@ export default function CityPage() {
                     <StatCard label="Internet" value={`${city.stats.internetSpeed} Mbps`} icon="🌐" />
                   </div>
                 </div>
+
+                {/* Booking CTA - Affiliate Links */}
+                <BookingCTA
+                  city={city.name}
+                  country={city.country}
+                  variant="full"
+                />
 
                 {/* Extended Info Summary */}
                 {ext && (
@@ -672,6 +680,13 @@ export default function CityPage() {
 
             {activeTab === "travel" && ext && (
               <div className="space-y-6">
+                {/* Quick Booking Links */}
+                <BookingCTA
+                  city={city.name}
+                  country={city.country}
+                  variant="full"
+                />
+
                 {/* Tourism Info */}
                 <div className="bg-white rounded-lg p-6 shadow-sm">
                   <h3 className="text-xl font-bold mb-4">Tourism & Attractions</h3>

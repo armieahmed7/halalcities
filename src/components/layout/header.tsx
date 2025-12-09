@@ -23,7 +23,8 @@ import {
   Clock,
   GitCompare,
   Plane,
-  Loader2
+  Loader2,
+  Sparkles
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -141,6 +142,19 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Pricing Link */}
+          <Link
+            href="/pricing"
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              pathname === '/pricing'
+                ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20"
+                : "text-[var(--foreground-secondary)] hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            Pricing
+          </Link>
         </nav>
 
         {/* Right Section */}
@@ -274,6 +288,23 @@ export function Header() {
                 </div>
               </Link>
             ))}
+
+            {/* Pricing Link in Mobile Menu */}
+            <Link
+              href="/pricing"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                pathname === '/pricing'
+                  ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20"
+                  : "text-[var(--foreground-secondary)] hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+              }`}
+            >
+              <Sparkles className="w-5 h-5 text-emerald-500" />
+              <div>
+                <p className="font-medium">Pricing</p>
+                <p className="text-xs text-[var(--foreground-muted)]">View Pro & Business plans</p>
+              </div>
+            </Link>
 
             {!user && (
               <div className="pt-4 border-t border-[var(--border)] flex gap-2">

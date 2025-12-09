@@ -21,6 +21,10 @@ interface UserProfile {
   }
   created_at: string
   updated_at: string
+  // Subscription fields
+  subscription_tier?: 'free' | 'pro' | 'business'
+  stripe_customer_id?: string | null
+  subscription_status?: 'active' | 'canceled' | 'past_due' | null
 }
 
 interface AuthContextType {

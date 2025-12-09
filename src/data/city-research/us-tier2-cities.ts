@@ -2764,7 +2764,7 @@ export const milwaukeeData: CityMuslimCommunityData = {
   islamicEducation: {
     fullTimeSchools: [
       { name: 'Salam School', grades: 'K-12', type: 'full-time', accredited: true },
-      { name: 'Clara Muhammad School', grades: 'K-8', type: 'full-time', accredited: true, established: 1972 },
+      { name: 'Clara Muhammad School', grades: 'K-8', type: 'full-time', accredited: true },
     ],
     weekendPrograms: ['ISM weekend school'],
     hifzPrograms: ['Available'],

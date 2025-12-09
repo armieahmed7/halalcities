@@ -2159,7 +2159,7 @@ export const moscowData: CityMuslimCommunityData = {
         languages: ['Russian', 'Arabic', 'Tatar'],
         hasWomensSection: true,
         jummahTimes: ['13:00'],
-        established: 1990s,
+        established: 1995,
         features: ['Social services', 'Outreach programs', 'Charity work'],
       },
       {

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { cities } from "@/data/cities"
+import { getCityResearch } from "@/data/city-research/get-city-research"
 import {
   Users,
   MapPin,
@@ -15,7 +16,12 @@ import {
   Globe,
   Home,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Plane,
+  GraduationCap,
+  Landmark,
+  Info,
+  Star
 } from "lucide-react"
 
 interface PageProps {
@@ -75,6 +81,8 @@ export default async function MuslimCommunityPage({ params }: PageProps) {
   }
 
   const ext = city.extended
+  // Get detailed research data if available
+  const research = getCityResearch(slug)
 
   const nearbyCities = cities
     .filter(c => c.country === city.country && c.slug !== city.slug)
@@ -266,8 +274,34 @@ export default async function MuslimCommunityPage({ params }: PageProps) {
                 </p>
               </section>
 
-              {/* Major Ethnicities */}
-              {ext?.demographics.majorEthnicities && ext.demographics.majorEthnicities.length > 0 && (
+              {/* Enhanced Ethnic Breakdown from Research */}
+              {research?.ethnicBreakdown && research.ethnicBreakdown.length > 0 ? (
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">
+                    Muslim Community Ethnic Breakdown
+                  </h2>
+                  <div className="space-y-3">
+                    {research.ethnicBreakdown.map((ethnic, i) => (
+                      <div key={i} className="flex items-center gap-4">
+                        <div className="flex-1">
+                          <div className="flex justify-between mb-1">
+                            <span className="font-medium text-[var(--foreground)]">{ethnic.group}</span>
+                            <span className="text-sm text-[var(--foreground-muted)]">{ethnic.percentage}%</span>
+                          </div>
+                          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div className="h-full bg-green-500" style={{ width: `${ethnic.percentage}%` }} />
+                          </div>
+                          {ethnic.countries.length > 0 && (
+                            <p className="text-xs text-[var(--foreground-muted)] mt-1">
+                              Origins: {ethnic.countries.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : ext?.demographics.majorEthnicities && ext.demographics.majorEthnicities.length > 0 ? (
                 <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
                   <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">
                     Major Muslim Ethnicities
@@ -280,10 +314,72 @@ export default async function MuslimCommunityPage({ params }: PageProps) {
                     ))}
                   </div>
                 </section>
-              )}
+              ) : null}
 
-              {/* Muslim-Friendly Neighborhoods */}
-              {ext?.demographics.areas && ext.demographics.areas.length > 0 && (
+              {/* Enhanced Muslim Neighborhoods from Research */}
+              {research?.muslimNeighborhoods && research.muslimNeighborhoods.length > 0 ? (
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    <Home className="w-5 h-5 text-blue-500" />
+                    Muslim-Friendly Neighborhoods in {city.name}
+                  </h2>
+                  <p className="text-[var(--foreground-secondary)] mb-4">
+                    Detailed guide to neighborhoods with Muslim communities, halal food, and mosques.
+                  </p>
+                  <div className="space-y-4">
+                    {research.muslimNeighborhoods.map((neighborhood, i) => (
+                      <div key={i} className="p-4 bg-[var(--background-secondary)] rounded-lg">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="font-bold text-[var(--foreground)]">{neighborhood.name}</h3>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {neighborhood.dominantEthnicities.map((eth, j) => (
+                                <span key={j} className="text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded">
+                                  {eth}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            neighborhood.muslimPopulation === 'high' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                            neighborhood.muslimPopulation === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                            'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                          }`}>
+                            {neighborhood.muslimPopulation} Muslim pop.
+                          </span>
+                        </div>
+                        <p className="text-sm text-[var(--foreground-secondary)] mb-3">{neighborhood.description}</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                          <div className="flex items-center gap-1">
+                            <Building2 className="w-3 h-3 text-blue-500" />
+                            <span>{neighborhood.mosqueCount} mosques</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Utensils className="w-3 h-3 text-orange-500" />
+                            <span>{neighborhood.halalRestaurantCount} halal places</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Shield className="w-3 h-3 text-green-500" />
+                            <span>Safety: {neighborhood.safetyRating}/10</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className={`${
+                              neighborhood.affordability === 'affordable' ? 'text-green-600' :
+                              neighborhood.affordability === 'moderate' ? 'text-yellow-600' : 'text-red-600'
+                            }`}>
+                              {neighborhood.affordability === 'affordable' ? '$' : neighborhood.affordability === 'moderate' ? '$$' : '$$$'}
+                            </span>
+                            <span>{neighborhood.affordability}</span>
+                          </div>
+                        </div>
+                        <div className="mt-2 text-xs text-[var(--foreground-muted)]">
+                          Public transport: {neighborhood.publicTransport}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : ext?.demographics.areas && ext.demographics.areas.length > 0 ? (
                 <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
                   <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
                     <Home className="w-5 h-5 text-blue-500" />
@@ -312,7 +408,7 @@ export default async function MuslimCommunityPage({ params }: PageProps) {
                     ))}
                   </div>
                 </section>
-              )}
+              ) : null}
 
               {/* Safety & Discrimination */}
               {ext?.discrimination && (
@@ -398,44 +494,319 @@ export default async function MuslimCommunityPage({ params }: PageProps) {
                 </section>
               )}
 
-              {/* Tips for Muslim Expats */}
-              <section className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border border-green-100 dark:border-green-800">
-                <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">
-                  Tips for Muslims Moving to {city.name}
-                </h2>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-[var(--foreground-secondary)]">
-                      {ext?.demographics.areas && ext.demographics.areas.length > 0
-                        ? `Consider living in ${ext.demographics.areas[0].name} or similar Muslim-friendly areas for easier access to mosques and halal food`
-                        : "Research neighborhoods with mosques and halal restaurants nearby before choosing where to live"}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-[var(--foreground-secondary)]">
-                      Connect with the local mosque community - they often help newcomers find housing and jobs
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-[var(--foreground-secondary)]">
-                      {city.features.islamicBanks
-                        ? "Islamic banking options are available - look into halal mortgage and finance options"
-                        : "Research Islamic finance options before moving - conventional banking may be the primary option"}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-[var(--foreground-secondary)]">
-                      {city.features.islamicSchools > 0
-                        ? `There are ${city.features.islamicSchools}+ Islamic schools for children - research enrollment requirements early`
-                        : "Research Islamic education options for children, including weekend schools at mosques"}
-                    </span>
-                  </li>
-                </ul>
-              </section>
+              {/* Major Mosques from Research */}
+              {research?.mosques.majorMosques && research.mosques.majorMosques.length > 0 && (
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-green-500" />
+                    Major Mosques in {city.name}
+                  </h2>
+                  <div className="space-y-4">
+                    {research.mosques.majorMosques.slice(0, 5).map((mosque, i) => (
+                      <div key={i} className="p-4 bg-[var(--background-secondary)] rounded-lg">
+                        <h3 className="font-bold text-[var(--foreground)] mb-1">{mosque.name}</h3>
+                        <p className="text-sm text-[var(--foreground-muted)] mb-2">{mosque.address}</p>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded">
+                            {mosque.type}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded">
+                            {mosque.size} size
+                          </span>
+                          {mosque.hasWomensSection && (
+                            <span className="text-xs px-2 py-0.5 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded">
+                              Women&apos;s section
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-[var(--foreground-muted)]">
+                          <span>Languages: {mosque.languages.join(', ')}</span>
+                          {mosque.jummahTimes && mosque.jummahTimes.length > 0 && (
+                            <span className="ml-3">Jummah: {mosque.jummahTimes.join(', ')}</span>
+                          )}
+                        </div>
+                        {mosque.features && mosque.features.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {mosque.features.map((feature, j) => (
+                              <span key={j} className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">
+                                {feature}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <Link
+                    href={`/city/${city.slug}/mosques`}
+                    className="mt-4 inline-flex items-center gap-2 text-[var(--primary)] hover:underline"
+                  >
+                    View all {research.mosques.totalCount}+ mosques <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </section>
+              )}
+
+              {/* Airport Prayer Facilities */}
+              {research?.travelInfo.airport && (
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    <Plane className="w-5 h-5 text-blue-500" />
+                    Airport Prayer Facilities
+                  </h2>
+                  <div className="p-4 bg-[var(--background-secondary)] rounded-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-bold text-[var(--foreground)]">{research.travelInfo.airport.airportCode}</span>
+                      {research.travelInfo.airport.hasPrayerRoom ? (
+                        <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm">
+                          Prayer Room Available
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-full text-sm">
+                          No Dedicated Prayer Room
+                        </span>
+                      )}
+                    </div>
+                    {research.travelInfo.airport.location && (
+                      <p className="text-sm text-[var(--foreground-secondary)] mb-2">
+                        <strong>Location:</strong> {research.travelInfo.airport.location}
+                      </p>
+                    )}
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="w-4 h-4 text-[var(--foreground-muted)]" />
+                        <span>{research.travelInfo.airport.is24Hours ? '24 hours' : 'Limited hours'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        {research.travelInfo.airport.hasWuduFacility ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            <span>Wudu available</span>
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                            <span>No wudu facility</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    {research.travelInfo.airport.halalFoodOptions && research.travelInfo.airport.halalFoodOptions.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-[var(--border)]">
+                        <p className="text-sm font-medium mb-2">Halal Food at Airport:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {research.travelInfo.airport.halalFoodOptions.map((option, i) => (
+                            <span key={i} className="text-xs px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded">
+                              {option}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* Islamic Education from Research */}
+              {research?.islamicEducation && (research.islamicEducation.fullTimeSchools.length > 0 || research.islamicEducation.weekendPrograms.length > 0) && (
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-purple-500" />
+                    Islamic Education in {city.name}
+                  </h2>
+
+                  {research.islamicEducation.fullTimeSchools.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-[var(--foreground)] mb-2">Full-Time Islamic Schools</h3>
+                      <div className="space-y-2">
+                        {research.islamicEducation.fullTimeSchools.slice(0, 4).map((school, i) => (
+                          <div key={i} className="p-3 bg-[var(--background-secondary)] rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-[var(--foreground)]">{school.name}</span>
+                              {school.accredited && (
+                                <span className="text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 rounded">Accredited</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-[var(--foreground-muted)]">Grades: {school.grades}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {research.islamicEducation.hifzPrograms.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-[var(--foreground)] mb-2">Quran Memorization (Hifz)</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {research.islamicEducation.hifzPrograms.map((program, i) => (
+                          <span key={i} className="text-sm px-3 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded">
+                            {program}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {research.islamicEducation.universitiesWithMSA.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-[var(--foreground)] mb-2">Universities with MSA</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {research.islamicEducation.universitiesWithMSA.map((uni, i) => (
+                          <span key={i} className="text-sm px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded">
+                            {uni}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {/* Community Resources from Research */}
+              {research?.communityResources && (
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    <Landmark className="w-5 h-5 text-indigo-500" />
+                    Muslim Community Resources
+                  </h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {research.communityResources.islamicCenters.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold text-[var(--foreground)] mb-2">Islamic Centers</h3>
+                        <ul className="space-y-1">
+                          {research.communityResources.islamicCenters.slice(0, 3).map((center, i) => (
+                            <li key={i} className="text-sm text-[var(--foreground-secondary)]">• {center}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {research.communityResources.advocacyOrgs.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold text-[var(--foreground)] mb-2">Advocacy Organizations</h3>
+                        <ul className="space-y-1">
+                          {research.communityResources.advocacyOrgs.slice(0, 3).map((org, i) => (
+                            <li key={i} className="text-sm text-[var(--foreground-secondary)]">• {org}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {research.communityResources.socialGroups.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold text-[var(--foreground)] mb-2">Social Groups</h3>
+                        <ul className="space-y-1">
+                          {research.communityResources.socialGroups.slice(0, 3).map((group, i) => (
+                            <li key={i} className="text-sm text-[var(--foreground-secondary)]">• {group}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {research.communityResources.converts.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold text-[var(--foreground)] mb-2">Convert Support</h3>
+                        <ul className="space-y-1">
+                          {research.communityResources.converts.slice(0, 3).map((program, i) => (
+                            <li key={i} className="text-sm text-[var(--foreground-secondary)]">• {program}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* Unique Features from Research */}
+              {research?.uniqueFeatures && research.uniqueFeatures.length > 0 && (
+                <section className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-purple-100 dark:border-purple-800">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-purple-500" />
+                    What Makes {city.name} Special for Muslims
+                  </h2>
+                  <ul className="space-y-3">
+                    {research.uniqueFeatures.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <Star className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--foreground-secondary)]">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {/* Enhanced Visitor Tips from Research */}
+              {research?.visitorTips && research.visitorTips.length > 0 && (
+                <section className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    <Info className="w-5 h-5 text-blue-500" />
+                    Tips for Muslim Visitors to {city.name}
+                  </h2>
+                  <ul className="space-y-3">
+                    {research.visitorTips.map((tip, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--foreground-secondary)]">{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {/* Enhanced Expat Tips from Research */}
+              {research?.expatTips && research.expatTips.length > 0 ? (
+                <section className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border border-green-100 dark:border-green-800">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">
+                    Tips for Muslims Moving to {city.name}
+                  </h2>
+                  <ul className="space-y-3">
+                    {research.expatTips.map((tip, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--foreground-secondary)]">{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : (
+                <section className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border border-green-100 dark:border-green-800">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">
+                    Tips for Muslims Moving to {city.name}
+                  </h2>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-[var(--foreground-secondary)]">
+                        {ext?.demographics.areas && ext.demographics.areas.length > 0
+                          ? `Consider living in ${ext.demographics.areas[0].name} or similar Muslim-friendly areas for easier access to mosques and halal food`
+                          : "Research neighborhoods with mosques and halal restaurants nearby before choosing where to live"}
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-[var(--foreground-secondary)]">
+                        Connect with the local mosque community - they often help newcomers find housing and jobs
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-[var(--foreground-secondary)]">
+                        {city.features.islamicBanks
+                          ? "Islamic banking options are available - look into halal mortgage and finance options"
+                          : "Research Islamic finance options before moving - conventional banking may be the primary option"}
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-[var(--foreground-secondary)]">
+                        {city.features.islamicSchools > 0
+                          ? `There are ${city.features.islamicSchools}+ Islamic schools for children - research enrollment requirements early`
+                          : "Research Islamic education options for children, including weekend schools at mosques"}
+                      </span>
+                    </li>
+                  </ul>
+                </section>
+              )}
 
               {/* FAQ Section */}
               <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-[var(--border)]">

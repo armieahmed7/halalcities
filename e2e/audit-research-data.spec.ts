@@ -1,115 +1,151 @@
 import { test, expect } from '@playwright/test';
 
-test.describe.configure({ timeout: 60000 });
+test.describe.configure({ timeout: 90000 });
 
-test('Audit London muslim-community page', async ({ page }) => {
-  await page.goto('https://halalcities.netlify.app/city/london/muslim-community', {
-    waitUntil: 'domcontentloaded',
-    timeout: 45000,
-  });
+// Test cities that have research data - sample from each region
+const CITIES_TO_AUDIT = [
+  { slug: 'london', name: 'London', country: 'UK' },
+  { slug: 'new-york', name: 'New York', country: 'USA' },
+  { slug: 'paris', name: 'Paris', country: 'France' },
+  { slug: 'berlin', name: 'Berlin', country: 'Germany' },
+  { slug: 'istanbul', name: 'Istanbul', country: 'Turkey' },
+  { slug: 'amsterdam', name: 'Amsterdam', country: 'Netherlands' },
+  { slug: 'detroit', name: 'Detroit', country: 'USA' },
+  { slug: 'birmingham', name: 'Birmingham', country: 'UK' },
+];
 
-  // Wait a bit for hydration
-  await page.waitForTimeout(3000);
+test.describe('Comprehensive Muslim Community Page Audit', () => {
+  for (const city of CITIES_TO_AUDIT) {
+    test(`Audit ${city.name} (${city.country}) muslim-community page`, async ({ page }) => {
+      await page.goto(`https://halalcities.netlify.app/city/${city.slug}/muslim-community`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
 
-  // Take a screenshot for review
-  await page.screenshot({
-    path: 'e2e/screenshots/london-muslim-community.png',
-    fullPage: true
-  });
+      await page.waitForTimeout(2000);
 
-  // Get all text content for analysis
-  const content = await page.content();
+      console.log(`\n========== ${city.name.toUpperCase()} (${city.country}) AUDIT ==========`);
 
-  console.log('\n========== LONDON PAGE AUDIT ==========');
+      // Check for NEW research data sections (should all be present)
+      const newSections = [
+        { selector: 'text=Muslim Community Ethnic Breakdown', name: 'Ethnic Breakdown' },
+        { selector: 'text=Muslim-Friendly Neighborhoods in', name: 'Neighborhoods' },
+        { selector: 'text=Major Mosques in', name: 'Major Mosques' },
+        { selector: 'text=Airport Prayer Facilities', name: 'Airport Info' },
+        { selector: 'text=What Makes', name: 'Unique Features' },
+        { selector: 'text=Tips for Muslim Visitors', name: 'Visitor Tips' },
+      ];
 
-  // Check for NEW research data sections
-  const checks = [
-    { selector: 'text=Muslim Community Ethnic Breakdown', desc: 'Ethnic breakdown section (NEW)' },
-    { selector: 'text=South Asian', desc: 'South Asian ethnicity data' },
-    { selector: 'text=45%', desc: 'South Asian 45% percentage' },
-    { selector: 'text=Muslim-Friendly Neighborhoods in London', desc: 'Detailed neighborhoods (NEW)' },
-    { selector: 'text=Whitechapel/Tower Hamlets', desc: 'Tower Hamlets neighborhood' },
-    { selector: 'text=Major Mosques in London', desc: 'Major mosques section (NEW)' },
-    { selector: 'text=London Central Mosque', desc: 'Central Mosque name' },
-    { selector: 'text=146 Park Rd', desc: 'Central Mosque address' },
-    { selector: 'text=Airport Prayer Facilities', desc: 'Airport section (NEW)' },
-    { selector: 'text=LHR', desc: 'Airport code' },
-    { selector: 'text=Islamic Education in London', desc: 'Education section (NEW)' },
-    { selector: 'text=Tips for Muslim Visitors to London', desc: 'Visitor tips (NEW)' },
-    { selector: 'text=What Makes London Special', desc: 'Unique features (NEW)' },
-    { selector: 'text=462', desc: 'Correct mosque count (462)' },
-    { selector: 'text=Al Rayan Bank', desc: 'Islamic bank name' },
-  ];
+      console.log('\n--- New Research Sections ---');
+      let newSectionsFound = 0;
+      for (const section of newSections) {
+        const found = await page.locator(section.selector).count();
+        console.log(`${found > 0 ? '✓' : '✗'} ${section.name}: ${found > 0 ? 'FOUND' : 'MISSING'}`);
+        if (found > 0) newSectionsFound++;
+      }
 
-  for (const check of checks) {
-    const found = await page.locator(check.selector).count();
-    console.log(`${found > 0 ? '✓' : '✗'} ${check.desc}: ${found > 0 ? 'FOUND' : 'NOT FOUND'}`);
+      // Check for REMOVED old problematic sections
+      console.log('\n--- Old Sections (should be removed) ---');
+      const oldSections = [
+        { selector: 'text=Quality of Life for Muslims', name: 'Quality of Life' },
+        { selector: 'text=English Speaking', name: 'English Speaking score' },
+      ];
+
+      for (const section of oldSections) {
+        const found = await page.locator(section.selector).count();
+        console.log(`${found === 0 ? '✓' : '❌'} ${section.name}: ${found === 0 ? 'REMOVED (good)' : 'STILL PRESENT (bad)'}`);
+      }
+
+      // Check for NEW Safety & Acceptance section
+      console.log('\n--- Safety Section ---');
+      const newSafetySection = await page.locator('text=Safety & Acceptance in').count();
+      const oldSafetySection = await page.locator('text=Safety for Muslims in').count();
+      const acceptanceLevels = await page.locator('text=Acceptance levels').count();
+
+      if (newSafetySection > 0 && acceptanceLevels > 0) {
+        console.log('✓ Using NEW research-based safety section');
+      } else if (oldSafetySection > 0) {
+        console.log('⚠️ Using OLD discrimination-based safety section (no research data)');
+      } else {
+        console.log('✗ No safety section found');
+      }
+
+      // Summary
+      console.log('\n--- Summary ---');
+      console.log(`New sections found: ${newSectionsFound}/${newSections.length}`);
+
+      // Verify minimum sections exist
+      expect(newSectionsFound).toBeGreaterThanOrEqual(4);
+    });
   }
-
-  // Check for the problematic OLD data that shouldn't be there
-  console.log('\n--- Checking for problematic OLD data ---');
-
-  // English Speaking 5/10 is wrong for London
-  const englishCheck = content.includes('English Speaking') && content.includes('5/10');
-  console.log(`${englishCheck ? '❌ BAD' : '✓ OK'} English Speaking 5/10: ${englishCheck ? 'FOUND (WRONG!)' : 'Not showing'}`);
-
-  // Check for Quality of Life section (old data)
-  const qualitySection = await page.locator('text=Quality of Life for Muslims').count();
-  console.log(`${qualitySection > 0 ? '⚠️ OLD' : '✓ OK'} Quality of Life section (old data): ${qualitySection > 0 ? 'FOUND' : 'Not showing'}`);
-
-  // Check safety scores - new data has hijabAcceptance: 9
-  const discriminationSection = await page.locator('text=Safety for Muslims in London').count();
-  console.log(`Discrimination section: ${discriminationSection > 0 ? 'FOUND' : 'Not showing'}`);
-
-  // Look for the hijab score
-  const hijabScore = await page.locator('text=4/10').count();
-  console.log(`Hijab 4/10 (OLD wrong score): ${hijabScore > 0 ? '❌ FOUND - showing old data' : '✓ Not showing'}`);
 });
 
-test('Check Netlify deployment status', async ({ page }) => {
-  // Check if the site is responding
-  const response = await page.goto('https://halalcities.netlify.app/', {
-    waitUntil: 'domcontentloaded',
-    timeout: 30000,
-  });
-
-  console.log('\n========== DEPLOYMENT STATUS ==========');
-  console.log(`Site status: ${response?.status()}`);
-  console.log(`Site responding: ${response?.ok() ? 'YES' : 'NO'}`);
-});
-
-test('Debug: Compare London data sources', async ({ page }) => {
+test('Verify London shows correct acceptance scores', async ({ page }) => {
   await page.goto('https://halalcities.netlify.app/city/london/muslim-community', {
     waitUntil: 'domcontentloaded',
-    timeout: 45000,
+    timeout: 60000,
   });
 
   await page.waitForTimeout(2000);
 
-  console.log('\n========== DATA SOURCE ANALYSIS ==========');
+  console.log('\n========== LONDON SCORE VERIFICATION ==========');
 
-  // Check which population data is shown
+  // London should show 9/10 hijab acceptance, not 4/10
   const content = await page.content();
 
-  // New research data: 1.3M Muslims, 15%
-  // Check if the correct population is showing
-  if (content.includes('1.3M Muslims') || content.includes('1,300,000')) {
-    console.log('✓ Population: Showing NEW research data (1.3M)');
-  } else {
-    console.log('✗ Population: NOT showing new research data');
-  }
+  // Check for correct scores
+  const scoreChecks = [
+    { term: '9/10', desc: 'Hijab Acceptance 9/10', shouldFind: true },
+    { term: '7/10', desc: 'Niqab Acceptance 7/10', shouldFind: true },
+    { term: 'Acceptance levels', desc: 'New acceptance section', shouldFind: true },
+    { term: 'Quality of Life for Muslims', desc: 'Old QoL section', shouldFind: false },
+    { term: 'English Speaking', desc: 'English Speaking irrelevant metric', shouldFind: false },
+  ];
 
-  // Check for mosque count (should be 462 from new data, not 441 from old)
-  if (content.includes('462')) {
-    console.log('✓ Mosque count: Showing NEW research data (462)');
-  } else if (content.includes('441')) {
-    console.log('✗ Mosque count: Showing OLD data (441)');
-  } else {
-    console.log('? Mosque count: Unknown');
+  for (const check of scoreChecks) {
+    const found = content.includes(check.term);
+    const pass = found === check.shouldFind;
+    console.log(`${pass ? '✓' : '❌'} ${check.desc}: ${found ? 'FOUND' : 'NOT FOUND'} ${pass ? '' : '(WRONG!)'}`);
   }
+});
 
-  // Save content for manual inspection
-  const fs = require('fs');
-  fs.writeFileSync('e2e/screenshots/london-page-content.html', content);
-  console.log('\nPage HTML saved to e2e/screenshots/london-page-content.html');
+test('Verify Istanbul shows high Muslim-friendliness', async ({ page }) => {
+  await page.goto('https://halalcities.netlify.app/city/istanbul/muslim-community', {
+    waitUntil: 'domcontentloaded',
+    timeout: 60000,
+  });
+
+  await page.waitForTimeout(2000);
+
+  console.log('\n========== ISTANBUL SCORE VERIFICATION ==========');
+
+  const content = await page.content();
+
+  // Istanbul should have very high acceptance (majority Muslim city)
+  const checks = [
+    { term: '10/10', desc: 'Perfect acceptance score', shouldFind: true },
+    { term: 'low', desc: 'Low islamophobia level', shouldFind: true },
+  ];
+
+  for (const check of checks) {
+    const found = content.toLowerCase().includes(check.term.toLowerCase());
+    console.log(`${found === check.shouldFind ? '✓' : '⚠️'} ${check.desc}: ${found ? 'FOUND' : 'NOT FOUND'}`);
+  }
+});
+
+test('Take screenshots of key cities', async ({ page }) => {
+  const cities = ['london', 'new-york', 'paris', 'istanbul'];
+
+  for (const city of cities) {
+    await page.goto(`https://halalcities.netlify.app/city/${city}/muslim-community`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+    await page.waitForTimeout(1500);
+    await page.screenshot({
+      path: `e2e/screenshots/${city}-muslim-community.png`,
+      fullPage: true
+    });
+    console.log(`📸 Screenshot saved: ${city}-muslim-community.png`);
+  }
 });

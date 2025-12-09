@@ -2124,7 +2124,7 @@ export const moscowData: CityMuslimCommunityData = {
   ],
 
   mosques: {
-    totalCount: 4,
+    totalCount: 8, // Note: Moscow is under-served for mosques given its large Muslim population
     majorMosques: [
       {
         name: 'Moscow Cathedral Mosque',

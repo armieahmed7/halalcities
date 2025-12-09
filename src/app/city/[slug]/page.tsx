@@ -13,11 +13,11 @@ import { MosqueCard } from "@/components/city/mosque-card"
 import { CostOfLiving } from "@/components/city/cost-of-living"
 import { DigitalNomadGuide } from "@/components/city/digital-nomad-guide"
 import { ExtendedInfo } from "@/components/city/extended-info"
-import { LocationMap } from "@/components/city/location-map"
+import { LocationMapModern } from "@/components/city/location-map-modern"
 import { PrayerTimesWidget } from "@/components/city/prayer-times-widget"
 import { QiblaCompass } from "@/components/city/qibla-compass"
 import { RamadanGuide } from "@/components/city/ramadan-guide"
-import { HalalRestaurantsMap } from "@/components/city/halal-restaurants-map"
+import { HalalRestaurantsMapModern } from "@/components/city/halal-restaurants-map-modern"
 import { SubPageNav } from "@/components/city/sub-page-nav"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { Filter, MapPin, Users, Shield, Plane, Building2, Utensils, Info, Moon } from "lucide-react"
@@ -542,10 +542,19 @@ export default function CityPage() {
                 </div>
 
                 {/* Interactive Restaurant Map */}
-                <HalalRestaurantsMap
+                <HalalRestaurantsMapModern
                   cityName={city.name}
                   latitude={city.coordinates?.lat || 0}
                   longitude={city.coordinates?.lng || 0}
+                  restaurants={restaurantsByCity[city.slug]?.map(r => ({
+                    id: r.id,
+                    name: r.name,
+                    address: r.address,
+                    cuisine: r.cuisine,
+                    rating: r.rating,
+                    priceRange: r.priceLevel === 1 ? '$' : r.priceLevel === 2 ? '$$' : r.priceLevel === 3 ? '$$$' : '$$$$',
+                    isVerified: r.certifications.some(c => c.toLowerCase().includes('certified'))
+                  })) || []}
                 />
 
                 <div className="space-y-4">
@@ -619,7 +628,7 @@ export default function CityPage() {
                 )}
 
                 {showMap && (
-                  <LocationMap
+                  <LocationMapModern
                     cityName={city.name}
                     cityCoordinates={city.coordinates}
                     mosques={mosquesByCity[city.slug] || []}
@@ -788,7 +797,7 @@ export default function CityPage() {
           {/* Right Sidebar - Map */}
           <div className="lg:col-span-3">
             <div className="sticky top-32">
-              <LocationMap
+              <LocationMapModern
                 cityName={city.name}
                 cityCoordinates={city.coordinates}
                 mosques={mosquesByCity[city.slug] || []}

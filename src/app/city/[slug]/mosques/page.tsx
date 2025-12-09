@@ -5,7 +5,7 @@ import Link from "next/link"
 import { cities } from "@/data/cities"
 import { mosquesByCity } from "@/data/mosques"
 import { MosqueCard } from "@/components/city/mosque-card"
-import { LocationMap } from "@/components/city/location-map"
+import { LocationMapModern } from "@/components/city/location-map-modern"
 import { QiblaCompass } from "@/components/city/qibla-compass"
 import { PrayerTimesWidget } from "@/components/city/prayer-times-widget"
 import {
@@ -289,7 +289,7 @@ export default async function MosquesPage({ params }: PageProps) {
                   <MapPin className="w-5 h-5 text-green-500" />
                   Mosques Map
                 </h2>
-                <LocationMap
+                <LocationMapModern
                   cityName={city.name}
                   cityCoordinates={city.coordinates}
                   mosques={mosques}

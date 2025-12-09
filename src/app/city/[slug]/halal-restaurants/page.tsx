@@ -5,7 +5,7 @@ import Link from "next/link"
 import { cities } from "@/data/cities"
 import { restaurantsByCity } from "@/data/restaurants"
 import { RestaurantCard } from "@/components/city/restaurant-card"
-import { HalalRestaurantsMap } from "@/components/city/halal-restaurants-map"
+import { HalalRestaurantsMapModern } from "@/components/city/halal-restaurants-map-modern"
 import { SubPageNavSidebar, SubPageNavCompact } from "@/components/city/sub-page-nav"
 import { Breadcrumb, BreadcrumbSchema } from "@/components/ui/breadcrumb"
 import {
@@ -403,10 +403,19 @@ export default async function HalalRestaurantsPage({ params }: PageProps) {
                   <MapPin className="w-5 h-5 text-orange-500" />
                   Halal Restaurants Map
                 </h2>
-                <HalalRestaurantsMap
+                <HalalRestaurantsMapModern
                   cityName={city.name}
                   latitude={city.coordinates.lat}
                   longitude={city.coordinates.lng}
+                  restaurants={restaurants.map(r => ({
+                    id: r.id,
+                    name: r.name,
+                    address: r.address,
+                    cuisine: r.cuisine,
+                    rating: r.rating,
+                    priceRange: r.priceLevel === 1 ? '$' : r.priceLevel === 2 ? '$$' : r.priceLevel === 3 ? '$$$' : '$$$$',
+                    isVerified: r.certifications.some(c => c.toLowerCase().includes('certified'))
+                  }))}
                 />
               </section>
 

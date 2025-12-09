@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button } from '@/components/ui/button'
-import { Building2, Utensils, MapPin, Navigation, ExternalLink } from 'lucide-react'
+import { Building2, Utensils, MapPin, Navigation, ExternalLink, AlertTriangle } from 'lucide-react'
+import { MAPBOX_TOKEN, isMapboxConfigured } from '@/lib/mapbox'
 
-// Mapbox public token
-mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+// Set Mapbox token from environment
+mapboxgl.accessToken = MAPBOX_TOKEN
 
 interface Location {
   id: string
@@ -96,6 +97,10 @@ export function LocationMapModern({
   const [filter, setFilter] = useState<'all' | 'mosques' | 'restaurants'>(activeFilter)
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [mapError, setMapError] = useState(false)
+
+  // Check if Mapbox is configured
+  const isConfigured = isMapboxConfigured()
 
   // Filter locations
   const filteredMosques = filter === 'restaurants' ? [] : mosques
@@ -120,65 +125,77 @@ export function LocationMapModern({
 
   // Initialize map
   useEffect(() => {
-    if (!mapContainer.current || map.current) return
+    if (!mapContainer.current || map.current || !isConfigured) return
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [cityCoordinates.lng, cityCoordinates.lat],
-      zoom: 13,
-      pitch: 30,
-      antialias: true
-    })
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [cityCoordinates.lng, cityCoordinates.lat],
+        zoom: 13,
+        pitch: 30,
+        antialias: true
+      })
 
-    map.current.addControl(
-      new mapboxgl.NavigationControl({ visualizePitch: true }),
-      'top-right'
-    )
+      map.current.on('error', (e) => {
+        console.error('Map error:', e)
+        setMapError(true)
+      })
 
-    map.current.on('load', () => {
-      setIsLoaded(true)
+      map.current.addControl(
+        new mapboxgl.NavigationControl({ visualizePitch: true }),
+        'top-right'
+      )
 
-      // Add 3D buildings
-      const layers = map.current?.getStyle()?.layers
-      if (layers) {
-        const labelLayerId = layers.find(
-          (layer) => layer.type === 'symbol' && layer.layout?.['text-field']
-        )?.id
+      map.current.on('load', () => {
+        setIsLoaded(true)
 
-        map.current?.addLayer(
-          {
-            id: '3d-buildings',
-            source: 'composite',
-            'source-layer': 'building',
-            filter: ['==', 'extrude', 'true'],
-            type: 'fill-extrusion',
-            minzoom: 14,
-            paint: {
-              'fill-extrusion-color': '#e5e7eb',
-              'fill-extrusion-height': [
-                'interpolate', ['linear'], ['zoom'],
-                14, 0,
-                14.05, ['get', 'height']
-              ],
-              'fill-extrusion-base': [
-                'interpolate', ['linear'], ['zoom'],
-                14, 0,
-                14.05, ['get', 'min_height']
-              ],
-              'fill-extrusion-opacity': 0.5
-            }
-          },
-          labelLayerId
-        )
-      }
-    })
+        // Add 3D buildings
+        const layers = map.current?.getStyle()?.layers
+        if (layers) {
+          const labelLayerId = layers.find(
+            (layer) => layer.type === 'symbol' && layer.layout?.['text-field']
+          )?.id
+
+          map.current?.addLayer(
+            {
+              id: '3d-buildings',
+              source: 'composite',
+              'source-layer': 'building',
+              filter: ['==', 'extrude', 'true'],
+              type: 'fill-extrusion',
+              minzoom: 14,
+              paint: {
+                'fill-extrusion-color': '#e5e7eb',
+                'fill-extrusion-height': [
+                  'interpolate', ['linear'], ['zoom'],
+                  14, 0,
+                  14.05, ['get', 'height']
+                ],
+                'fill-extrusion-base': [
+                  'interpolate', ['linear'], ['zoom'],
+                  14, 0,
+                  14.05, ['get', 'min_height']
+                ],
+                'fill-extrusion-opacity': 0.5
+              }
+            },
+            labelLayerId
+          )
+        }
+      })
+    } catch (e) {
+      console.error('Failed to initialize map:', e)
+      setMapError(true)
+    }
 
     return () => {
-      map.current?.remove()
-      map.current = null
+      if (map.current) {
+        map.current.remove()
+        map.current = null
+      }
     }
-  }, [cityCoordinates])
+  }, [cityCoordinates, isConfigured])
 
   // Add markers
   useEffect(() => {
@@ -282,6 +299,36 @@ export function LocationMapModern({
       pitch: 45,
       duration: 1000
     })
+  }
+
+  // Show fallback UI if Mapbox is not configured or if there's an error
+  if (!isConfigured || mapError) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        <div className="p-4 border-b dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+          <h3 className="font-bold text-lg flex items-center gap-2 text-gray-900 dark:text-white">
+            <MapPin className="h-5 w-5 text-emerald-600" />
+            Map of {cityName}
+          </h3>
+        </div>
+        <div className="h-64 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-8">
+          <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Map Unavailable</h4>
+          <p className="text-gray-600 dark:text-gray-400 text-center text-sm mb-4">
+            Interactive map is currently unavailable. Please use the links below to view locations.
+          </p>
+          <a
+            href={`https://www.google.com/maps/search/mosques+halal+restaurants+${encodeURIComponent(cityName)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Open in Google Maps
+          </a>
+        </div>
+      </div>
+    )
   }
 
   return (

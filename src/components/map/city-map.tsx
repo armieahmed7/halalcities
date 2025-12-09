@@ -1,12 +1,14 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { City } from '@/types/city'
+import { MAPBOX_TOKEN, isMapboxConfigured } from '@/lib/mapbox'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 
-// Mapbox public token (you can replace with your own)
-mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+// Set Mapbox token from environment
+mapboxgl.accessToken = MAPBOX_TOKEN
 
 interface CityMapProps {
   cities: City[]
@@ -17,26 +19,43 @@ export function CityMap({ cities, onCityClick }: CityMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const markers = useRef<mapboxgl.Marker[]>([])
+  const [mapError, setMapError] = useState(false)
+
+  // Check if Mapbox is configured
+  const isConfigured = isMapboxConfigured()
 
   useEffect(() => {
-    if (!mapContainer.current || map.current) return
+    if (!mapContainer.current || map.current || !isConfigured) return
 
-    // Initialize map
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [0, 20],
-      zoom: 2,
-      projection: 'mercator'
-    })
+    try {
+      // Initialize map
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [0, 20],
+        zoom: 2,
+        projection: 'mercator'
+      })
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+      map.current.on('error', (e) => {
+        console.error('Map error:', e)
+        setMapError(true)
+      })
+
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+    } catch (e) {
+      console.error('Failed to initialize map:', e)
+      setMapError(true)
+    }
 
     return () => {
-      map.current?.remove()
+      if (map.current) {
+        map.current.remove()
+        map.current = null
+      }
     }
-  }, [])
+  }, [isConfigured])
 
   useEffect(() => {
     if (!map.current) return
@@ -116,10 +135,32 @@ export function CityMap({ cities, onCityClick }: CityMapProps) {
     }
   }, [cities, onCityClick])
 
+  // Show fallback UI if Mapbox is not configured or if there's an error
+  if (!isConfigured || mapError) {
+    return (
+      <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-8">
+        <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
+        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Map Unavailable</h4>
+        <p className="text-gray-600 dark:text-gray-400 text-center text-sm mb-4">
+          Interactive map is currently unavailable. Browse cities from the list below.
+        </p>
+        <a
+          href="https://www.google.com/maps/search/muslim+friendly+cities"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Explore on Google Maps
+        </a>
+      </div>
+    )
+  }
+
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg">
       <div ref={mapContainer} className="w-full h-full" />
-      
+
       {/* Map Legend */}
       <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-md">
         <h4 className="font-semibold text-sm mb-2">Halal Score</h4>

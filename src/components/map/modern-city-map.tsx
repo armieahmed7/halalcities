@@ -4,10 +4,11 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button } from '@/components/ui/button'
-import { Building2, Utensils, MapPin, Navigation, Layers, X, ChevronRight } from 'lucide-react'
+import { Building2, Utensils, MapPin, Navigation, Layers, X, ChevronRight, AlertTriangle } from 'lucide-react'
+import { MAPBOX_TOKEN, isMapboxConfigured } from '@/lib/mapbox'
 
-// Mapbox public token
-mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+// Set Mapbox token from environment
+mapboxgl.accessToken = MAPBOX_TOKEN
 
 interface Mosque {
   id: string
@@ -170,6 +171,10 @@ export function ModernCityMap({
   } | null>(null)
   const [mapStyle, setMapStyle] = useState<'streets' | 'satellite' | 'dark'>('streets')
   const [isLoaded, setIsLoaded] = useState(false)
+  const [mapError, setMapError] = useState(false)
+
+  // Check if Mapbox is configured
+  const isConfigured = isMapboxConfigured()
 
   const getMapStyleUrl = useCallback((style: 'streets' | 'satellite' | 'dark') => {
     switch (style) {
@@ -184,89 +189,101 @@ export function ModernCityMap({
 
   // Initialize map
   useEffect(() => {
-    if (!mapContainer.current || map.current) return
+    if (!mapContainer.current || map.current || !isConfigured) return
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: getMapStyleUrl(mapStyle),
-      center: [cityCoordinates.lng, cityCoordinates.lat],
-      zoom: 12,
-      pitch: 45,
-      bearing: -17.6,
-      antialias: true
-    })
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: getMapStyleUrl(mapStyle),
+        center: [cityCoordinates.lng, cityCoordinates.lat],
+        zoom: 12,
+        pitch: 45,
+        bearing: -17.6,
+        antialias: true
+      })
 
-    // Add navigation controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl({ visualizePitch: true }),
-      'top-right'
-    )
+      map.current.on('error', (e) => {
+        console.error('Map error:', e)
+        setMapError(true)
+      })
 
-    // Add fullscreen control
-    map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+      // Add navigation controls
+      map.current.addControl(
+        new mapboxgl.NavigationControl({ visualizePitch: true }),
+        'top-right'
+      )
 
-    // Add geolocate control
-    map.current.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-        showUserHeading: true
-      }),
-      'top-right'
-    )
+      // Add fullscreen control
+      map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
 
-    // Add 3D buildings on load
-    map.current.on('load', () => {
-      setIsLoaded(true)
+      // Add geolocate control
+      map.current.addControl(
+        new mapboxgl.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+          trackUserLocation: true,
+          showUserHeading: true
+        }),
+        'top-right'
+      )
 
-      // Add 3D building layer
-      const layers = map.current?.getStyle()?.layers
-      if (layers) {
-        const labelLayerId = layers.find(
-          (layer) => layer.type === 'symbol' && layer.layout?.['text-field']
-        )?.id
+      // Add 3D buildings on load
+      map.current.on('load', () => {
+        setIsLoaded(true)
 
-        map.current?.addLayer(
-          {
-            id: '3d-buildings',
-            source: 'composite',
-            'source-layer': 'building',
-            filter: ['==', 'extrude', 'true'],
-            type: 'fill-extrusion',
-            minzoom: 14,
-            paint: {
-              'fill-extrusion-color': '#aaa',
-              'fill-extrusion-height': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                14,
-                0,
-                14.05,
-                ['get', 'height']
-              ],
-              'fill-extrusion-base': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                14,
-                0,
-                14.05,
-                ['get', 'min_height']
-              ],
-              'fill-extrusion-opacity': 0.6
-            }
-          },
-          labelLayerId
-        )
-      }
-    })
+        // Add 3D building layer
+        const layers = map.current?.getStyle()?.layers
+        if (layers) {
+          const labelLayerId = layers.find(
+            (layer) => layer.type === 'symbol' && layer.layout?.['text-field']
+          )?.id
+
+          map.current?.addLayer(
+            {
+              id: '3d-buildings',
+              source: 'composite',
+              'source-layer': 'building',
+              filter: ['==', 'extrude', 'true'],
+              type: 'fill-extrusion',
+              minzoom: 14,
+              paint: {
+                'fill-extrusion-color': '#aaa',
+                'fill-extrusion-height': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  14,
+                  0,
+                  14.05,
+                  ['get', 'height']
+                ],
+                'fill-extrusion-base': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  14,
+                  0,
+                  14.05,
+                  ['get', 'min_height']
+                ],
+                'fill-extrusion-opacity': 0.6
+              }
+            },
+            labelLayerId
+          )
+        }
+      })
+    } catch (e) {
+      console.error('Failed to initialize map:', e)
+      setMapError(true)
+    }
 
     return () => {
-      map.current?.remove()
-      map.current = null
+      if (map.current) {
+        map.current.remove()
+        map.current = null
+      }
     }
-  }, [cityCoordinates, getMapStyleUrl, mapStyle])
+  }, [cityCoordinates, getMapStyleUrl, mapStyle, isConfigured])
 
   // Handle style changes
   useEffect(() => {
@@ -434,6 +451,41 @@ export function ModernCityMap({
   const mosquesWithCoords = mosques.filter(m => m.coordinates)
   const restaurantsWithCoords = restaurants.filter(r => r.coordinates)
   const neighborhoodsWithCoords = neighborhoods.filter(n => n.coordinates)
+
+  // Show fallback UI if Mapbox is not configured or if there's an error
+  if (!isConfigured || mapError) {
+    return (
+      <div className={`relative bg-white rounded-xl shadow-lg overflow-hidden ${className}`}>
+        <div className="p-4 border-b bg-gradient-to-r from-gray-50 to-white">
+          <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-emerald-600" />
+            {cityName}
+          </h3>
+          {halalScore && (
+            <p className="text-sm text-emerald-600 font-medium">
+              Halal Score: {halalScore}%
+            </p>
+          )}
+        </div>
+        <div className="h-96 flex flex-col items-center justify-center bg-gray-50 p-8">
+          <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
+          <h4 className="text-lg font-semibold text-gray-900 mb-2">Map Unavailable</h4>
+          <p className="text-gray-600 text-center text-sm mb-4">
+            Interactive map is currently unavailable. Please use Google Maps to explore.
+          </p>
+          <a
+            href={`https://www.google.com/maps/search/mosques+halal+restaurants+${encodeURIComponent(cityName)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            <ChevronRight className="h-4 w-4" />
+            Open in Google Maps
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={`relative bg-white rounded-xl shadow-lg overflow-hidden ${className}`}>
